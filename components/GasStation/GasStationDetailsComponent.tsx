@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
@@ -18,6 +19,7 @@ interface PumpData {
   rating: number;
   reviewCount: number;
   description: string;
+  status: "Open" | "Closed";
   hours: { day: string; hours: string }[];
   amenities: { name: string; icon: string }[];
 }
@@ -33,7 +35,9 @@ export const GasStationDetailsComponent: React.FC<PumpDetailsProps> = ({
     <ScrollView style={styles.container}>
       <BackButton />
       {/* Header Image */}
-      <Image source={{ uri: pumpData.imageUrl }} style={styles.headerImage} />
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: pumpData.imageUrl }} style={styles.headerImage} />
+      </View>
 
       {/* Station Name and Rating */}
       <View style={styles.infoContainer}>
@@ -47,6 +51,14 @@ export const GasStationDetailsComponent: React.FC<PumpDetailsProps> = ({
             ({pumpData.reviewCount} reviews)
           </Text>
         </View>
+        <Text
+          style={[
+            styles.status,
+            { color: pumpData.status === "Open" ? "green" : "red" },
+          ]}
+        >
+          {pumpData.status}
+        </Text>
       </View>
 
       {/* Action Buttons */}
@@ -62,7 +74,7 @@ export const GasStationDetailsComponent: React.FC<PumpDetailsProps> = ({
 
         <TouchableOpacity style={styles.actionButton1}>
           <Ionicons
-            name="share-social"
+            name="share-outline"
             size={35}
             color={Colors.lightColor.tintColor}
           />
@@ -112,9 +124,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.lightColor.background,
   },
+  imageContainer: {
+    // width: Dimensions.get("screen").width * 0.9,
+    // height: Dimensions.get("screen").height * 1,
+    padding: 5,
+  },
   headerImage: {
     width: "100%",
-    height: 200,
+    height: 250,
+    borderRadius: 15,
   },
   infoContainer: { padding: 15 },
   title: { fontSize: 20, fontFamily: "Outfit-Bold" },
@@ -122,6 +140,9 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", justifyContent: "space-between" },
   rating: { fontSize: 16, fontFamily: "Outfit-SemiBold" },
   reviewCount: { color: "gray", fontFamily: "Outfit-Regular" },
+  status: {
+    fontFamily: "Outfit-Regular",
+  },
   actionButtons: {
     flexDirection: "row",
     justifyContent: "flex-start",

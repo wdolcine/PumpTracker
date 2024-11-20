@@ -16,6 +16,7 @@ import { useTheme } from "@/hooks/themeContext";
 export default function Profile() {
   // const [darkMode, setDarkMode] = useState(false);
   const { colors, isDarkMode, toggleDarkMode } = useTheme();
+
   const onToggleDarkMode = () => {
     toggleDarkMode(!isDarkMode);
   };
@@ -45,11 +46,14 @@ export default function Profile() {
 
         {/* Profile Section */}
         <View style={styles.profileContainer}>
-          {currentUser?.firstName && currentUser.lastName ? (
+          {currentUser?.firstName &&
+          currentUser.lastName &&
+          currentUser.email ? (
             <>
               <Image
                 source={{
-                  uri: currentUser.profileImage || "",
+                  uri:
+                    currentUser.profileImage || "/assets/images/DSC_3693.jpg",
                 }}
                 style={styles.profileImage}
               />
@@ -76,7 +80,7 @@ export default function Profile() {
 
         {/* Switch dark and light mode */}
         <View>
-          <TouchableOpacity onPress={onToggleDarkMode}>
+          {/* <TouchableOpacity onPress={onToggleDarkMode}>
             <Switch
               value={isDarkMode}
               onValueChange={(value) => {
@@ -84,13 +88,13 @@ export default function Profile() {
               }}
               style={{ shadowColor: Colors.lightColor.text }}
             ></Switch>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {/* Quick Link */}
         <View style={styles.quickLinkContainer}>
           <Text style={styles.quickLinkText}>QUICK LINKS</Text>
-          <View style={styles.quickLink}>
+          {/* <View style={styles.quickLink}>
             <Ionicons
               name="time-outline"
               size={20}
@@ -104,7 +108,7 @@ export default function Profile() {
                 color={Colors.lightColor.iconDefault}
               />
             </TouchableOpacity>
-          </View>
+          </View> */}
           <View style={styles.quickLink}>
             <Ionicons
               name="shield-outline"

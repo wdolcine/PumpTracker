@@ -35,7 +35,7 @@ export default function LoginScreen() {
   }, [email, password]);
 
   const handleGoogle = async () => {
-    // await logInWithGoogle();
+    await logInWithGoogle();
     console.log("Google");
   };
   const NavigateRegister = () => {
@@ -51,7 +51,6 @@ export default function LoginScreen() {
     console.log("Password Forgetten");
   };
   return (
-    // <KeyboardAvoidingView behavior="padding">
     <View style={styles.container}>
       <Text style={styles.title}>Welcome back!</Text>
       <Text style={styles.subtitle}>Enter your credentials to continue.</Text>
@@ -100,14 +99,6 @@ export default function LoginScreen() {
             size={24}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <FontAwesome5
-            name="apple"
-            type="font-awesome"
-            color="#000"
-            size={24}
-          />
-        </TouchableOpacity>
       </View>
       <View style={styles.Footer}>
         <Text style={styles.footerText}>
@@ -127,7 +118,6 @@ export default function LoginScreen() {
         </TouchableOpacity>
       </View>
     </View>
-    // </KeyboardAvoidingView>
   );
 }
 
@@ -139,7 +129,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     justifyContent: "center",
     alignItems: "center",
-    minHeight: "100%",
+    minHeight: "auto",
+    marginTop: 40,
   },
   title: {
     fontSize: 24,

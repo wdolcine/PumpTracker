@@ -12,6 +12,8 @@ export interface LocationContextType {
   setLocation: React.Dispatch<
     React.SetStateAction<Location.LocationObject | null>
   >;
+  latitude: number;
+  longitude: number;
 }
 
 export const UserLocationContext = createContext<LocationContextType | null>(
@@ -34,12 +36,20 @@ export const UserLocationProvider: React.FC<{ children: ReactNode }> = ({
         console.error(errorMsg);
         return;
       }
-      let location = await Location.getCurrentPositionAsync({});
-      // const coords = location.coords;
-      setLocation(location);
-      // console.log(location.coords);
+      try {
+        let location = await Location.getCurrentPositionAsync({});
+        // const coords = location.coords;
+        setLocation(location);
+        console.log(location.coords);
+      } catch (error) {
+        console.error("Error getting location:", error);
+        setErrorMsg("Error retrieving location.");
+      }
     })();
   }, []);
+
+  const latitude = location?.coords.latitude ?? 0;
+  const longitude = location?.coords.longitude ?? 0;
 
   let text = "Waiting..";
   if (errorMsg) {
@@ -50,6 +60,8 @@ export const UserLocationProvider: React.FC<{ children: ReactNode }> = ({
   const value: LocationContextType = {
     location,
     setLocation,
+    latitude,
+    longitude,
   };
   return (
     <UserLocationContext.Provider value={value}>

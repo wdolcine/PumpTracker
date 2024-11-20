@@ -15,7 +15,7 @@ export default function BackButton() {
         <Ionicons
           name="arrow-back"
           size={24}
-          color={Colors.lightColor.iconDefault}
+          color={Colors.lightColor.tintColor}
         />
       </TouchableOpacity>
     </View>
@@ -24,8 +24,8 @@ export default function BackButton() {
 
 const styles = StyleSheet.create({
   touchableOpacity: {
-    paddingTop: 40,
-    paddingLeft: 20,
+    paddingTop: 60,
+    paddingLeft: 10,
     backgroundColor: Colors.lightColor.background,
     borderRadius: 5,
     width: 80,

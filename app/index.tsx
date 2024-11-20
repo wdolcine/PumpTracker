@@ -3,9 +3,10 @@ import { StyleSheet, ActivityIndicator, Image, View, Text } from "react-native";
 import { Colors } from "@/constants/Colors";
 import React, { useEffect } from "react";
 import "react-native-get-random-values";
+import OnBoardingScreen from "@/components/OnBoardScreen/OnBoardingScreen";
 
 export default function Page() {
-  // const router = useRouter();
+  const router = useRouter();
 
   // useEffect(() => {
   //   setTimeout(() => {
@@ -15,11 +16,12 @@ export default function Page() {
 
   return (
     <View style={styles.container}>
-      <Image
+      {/* <Image
         source={require("../assets/images/icon.png")}
         style={{ height: 330, width: 330 }}
       />
-      <Link href="../(tabs)/Home">Home</Link>
+      <Link href="../(tabs)/Home">Home</Link> */}
+      <OnBoardingScreen />
     </View>
   );
 }

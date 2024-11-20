@@ -12,10 +12,10 @@ import {
 import * as WebBrowser from "expo-web-browser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Google from "expo-auth-session/providers/google";
-import * as AppleAuthentication from "expo-apple-authentication";
 import { Firebase_auth } from "@/config/firebaseConfig";
 import { User, ExtraData } from "../utils";
 import { addUser } from "../utils/addUser";
+
 import { convertFirebaseUserToUser } from "../utils/convertFirebaseUser";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -29,7 +29,6 @@ export interface AuthContextType {
     extraData?: ExtraData
   ) => Promise<void>;
   logInWithGoogle: () => Promise<void>;
-  logInWithApple: () => Promise<void>;
   logout: () => Promise<void>;
 }
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -42,7 +41,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const router = useRouter();
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     androidClientId:
-      "729641409796-1q9i165bdi1ek4aigbd73a99a618i5r4.apps.googleusercontent.com",
+      "19833993261-ocr5md15t76qiqh0opmv1tf005cpnt34.apps.googleusercontent.com",
   });
 
   const getLocalUser = async () => {
@@ -60,15 +59,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     getLocalUser();
-
     const unsubscribe = onAuthStateChanged(Firebase_auth, async (user) => {
       if (user) {
         const appUser = convertFirebaseUserToUser(user);
         setCurrentUser(appUser);
         await AsyncStorage.setItem("@user", JSON.stringify(appUser));
+        router.replace("/(tabs)/Home");
         console.log("User authenticated");
       } else {
         setCurrentUser(null);
+        router.replace("/(auth)/LoginScreen");
         console.log("User not authenticated");
       }
       setLoading(false);
@@ -153,6 +153,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   // Google Login
   const logInWithGoogle = async () => {
     try {
+      console.log("Logging with google");
       await promptAsync();
     } catch (error) {
       if (error instanceof Error) {
@@ -163,37 +164,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // Apple Login
-  const logInWithApple = async () => {
-    // try {
-    //   const appleCredential = await AppleAuthentication.signInAsync({
-    //     requestedScopes: [
-    //       AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-    //       AppleAuthentication.AppleAuthenticationScope.EMAIL,
-    //     ],
-    //   });
-    //   if (appleCredential.identityToken) {
-    //     const provider = new OAuthProvider("apple.com");
-    //     const credential = provider.credential({
-    //       idToken: appleCredential.identityToken,
-    //     });
-    //     const result = await signInWithCredential(Firebase_auth, credential);
-    //     const user = convertFirebaseUserToUser(result.user);
-    //     await addUser(user);
-    //     setCurrentUser(user);
-    //   }
-    // } catch (error) {
-    //   console.error("Apple login failed:", error);
-    // }
-  };
-
   // Logout
   const logout = async () => {
     try {
       await signOut(Firebase_auth);
       await AsyncStorage.removeItem("@user");
       setCurrentUser(null);
-      router.replace("/(auth)/LoginScreen");
+      router.replace("/");
     } catch (error) {
       if (error instanceof Error) {
         console.error("Logout Error:", error.message);
@@ -208,7 +185,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     login,
     signup,
     logInWithGoogle,
-    logInWithApple,
     logout,
   };
   return (

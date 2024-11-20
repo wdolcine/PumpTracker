@@ -27,13 +27,6 @@ export default function TabLayout() {
           title: "Pumps",
         }}
       />
-      {/* <Tabs.Screen
-        name="Search"
-        options={{
-          title: "Search",
-        }}
-      /> */}
-
       <Tabs.Screen
         name="Profile"
         options={{

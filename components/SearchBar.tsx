@@ -42,7 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onLocationSelected }) => {
         color={Colors.lightColor.iconSelected}
         style={{ paddingTop: 10 }}
       />
-      {/* <GooglePlacesAutocomplete
+      <GooglePlacesAutocomplete
         placeholder="Search Gas Station"
         fetchDetails={false}
         onPress={(data) => {
@@ -72,7 +72,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onLocationSelected }) => {
               "google-place-autocomplete-and-place-info.p.rapidapi.com",
           },
         }}
-      /> */}
+      />
     </View>
   );
 };

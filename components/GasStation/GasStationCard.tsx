@@ -16,25 +16,18 @@ import { Ionicons } from "@expo/vector-icons";
 interface GasStationCardProps {
   title: string;
   address: string;
-  status: "open" | "closed";
   onPress: () => void;
 }
 
 const GasStationCard: React.FC<GasStationCardProps> = ({
   title,
   address,
-  status,
   onPress,
 }) => {
   return (
     <Pressable style={styles.cardContainer} onPress={onPress}>
       {/* Status icon (Green for open, Red for closed) */}
-      <View
-        style={[
-          styles.iconContainer,
-          { backgroundColor: status === "open" ? "green" : "red" },
-        ]}
-      >
+      <View style={[styles.iconContainer, { backgroundColor: "green" }]}>
         <FontAwesome6
           name="gas-pump"
           size={24}
@@ -45,7 +38,7 @@ const GasStationCard: React.FC<GasStationCardProps> = ({
 
       {/* Station details */}
       <View style={styles.detailsContainer}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title}>{title ? title : "Gas Station"}</Text>
         <Text style={styles.subtitle}>{address}</Text>
       </View>
 

@@ -134,14 +134,6 @@ const RegisterScreen = () => {
             size={24}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <FontAwesome5
-            name="apple"
-            type="font-awesome"
-            color="#000"
-            size={24}
-          />
-        </TouchableOpacity>
       </View>
 
       <View style={styles.checkboxContainer}>
@@ -176,8 +168,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     justifyContent: "center",
     alignItems: "center",
-    minHeight: "100%",
-    paddingTop: 50,
+    minHeight: "auto",
+    marginTop: 40,
   },
   title: {
     fontSize: 24,
@@ -201,7 +193,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
-    elevation: 2,
+    // elevation: 2,
   },
   registerButton: {
     backgroundColor: Colors.lightColor.button,

@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import axios from "axios";
+import { Colors } from "@/constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
 
 interface Location {
   lat: number;
@@ -32,6 +33,10 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
       setSuggestions([]);
       return;
     }
+    const clearSearch = () => {
+      setQuery("");
+      setSuggestions([]);
+    };
 
     const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${input}&apiKey=${GEOAPIFY_API_KEY}`;
 
@@ -51,39 +56,40 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
     }
   };
 
-  //   const fetchPlaceDetails = async (placeId: string) => {
-  //     const options = {
-  //       method: "GET",
-  //       url: "https://geoapify-address-autocomplete.p.rapidapi.com/v1/geocode/autocomplete",
-  //       params: { place_id: placeId },
-  //       headers: {
-  //         "x-rapidapi-key": "87abf5d295msh20298c5e7f80999p14eb62jsn48e74a768ff8",
-  //         "x-rapidapi-host": "geoapify-address-autocomplete.p.rapidapi.com",
-  //       },
-  //     };
-
-  //     try {
-  //       const response = await axios.request(options);
-  //       const location = response.data.result.geometry.location;
-  //       onLocationSelected(location); // Pass location to the parent component
-  //       setSuggestions([]); // Clear suggestions after selecting
-  //       setQuery(""); // Clear query after selecting
-  //     } catch (error) {
-  //       console.error("Error fetching place details:", error);
-  //     }
-  //   };
-
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Search for a place"
-        value={query}
-        onChangeText={(text) => {
-          setQuery(text);
-          fetchSuggestions(text);
-        }}
-      />
+      <View style={styles.container2}>
+        <Ionicons
+          name="location-sharp"
+          size={24}
+          color={Colors.lightColor.iconSelected}
+          style={{ paddingTop: 10 }}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Search Gas Station"
+          value={query}
+          onChangeText={(text) => {
+            setQuery(text);
+            fetchSuggestions(text);
+          }}
+        />
+        {query.length > 0 && (
+          <TouchableOpacity
+            onPress={() => {
+              setQuery("");
+              setSuggestions([]);
+            }}
+          >
+            <Ionicons
+              name="close-circle"
+              size={24}
+              color={Colors.lightColor.iconDefault}
+              style={{ paddingTop: 10 }}
+            ></Ionicons>
+          </TouchableOpacity>
+        )}
+      </View>
       <FlatList
         data={suggestions}
         keyExtractor={(item) => item.place_id}
@@ -106,13 +112,19 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
+    padding: 5,
+    marginTop: 30,
+    backgroundColor: Colors.lightColor.textButton,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 10,
+    display: "flex",
+  },
+  container2: {
+    flexDirection: "row",
   },
   input: {
     height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 5,
   },
@@ -120,6 +132,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
+    // borderTopWidth: 0.1,
   },
   suggestionText: {
     fontSize: 16,

@@ -11,34 +11,33 @@ import "react-native-reanimated";
 import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import {
-  UserLocationContext,
-  UserLocationProvider,
-} from "@/context/UserLocationContext";
+import { UserLocationProvider } from "@/context/UserLocationContext";
 import { useAuth } from "@/context/useAuth";
 import { ThemeProvider } from "@/hooks/themeContext";
 import { AuthProvider } from "@/context/AuthContext";
-import * as Location from "expo-location";
+import { FetchGasStationsProvider } from "@/services/fetchGasStations";
+import ProtectedRoute from "@/components/navigation/ProtectedRoute";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
-  const [location, setLocation] = useState<Location.LocationObject | null>(
-    null
-  );
 
   useEffect(() => {
     const loadFonts = async () => {
-      await Font.loadAsync({
-        "Outfit-Bold": require("../assets/fonts/Outfit-Bold.ttf"),
-        "Outfit-Regular": require("../assets/fonts/Outfit-Regular.ttf"),
-        "Outfit-SemiBold": require("../assets/fonts/Outfit-SemiBold.ttf"),
-      });
-      setFontsLoaded(true);
+      try {
+        await Font.loadAsync({
+          "Outfit-Bold": require("../assets/fonts/Outfit-Bold.ttf"),
+          "Outfit-Regular": require("../assets/fonts/Outfit-Regular.ttf"),
+          "Outfit-SemiBold": require("../assets/fonts/Outfit-SemiBold.ttf"),
+        });
+        setFontsLoaded(true);
+        await SplashScreen.hideAsync();
+      } catch (error) {
+        console.error("Error loading fonts or hiding splash screen:", error);
+      }
     };
-
     loadFonts();
   }, [fontsLoaded]);
 
@@ -54,8 +53,12 @@ export default function RootLayout() {
     <AuthProvider>
       <ThemeProvider>
         <UserLocationProvider>
-          <AppNavigation />
-          <StatusBar style="auto" />
+          <FetchGasStationsProvider>
+            <ProtectedRoute>
+              <AppNavigation />
+            </ProtectedRoute>
+          </FetchGasStationsProvider>
+          <StatusBar style="dark" />
         </UserLocationProvider>
       </ThemeProvider>
     </AuthProvider>
