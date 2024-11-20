@@ -1,16 +1,22 @@
-# Welcome to your Expo app 👋
+# Welcome to your PumpTracker 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
-
+PumpTracker
+PumpTracker is a cross-platform mobile application developed using React Native and Expo. The app helps users locate nearby gas stations, view real-time updates about their locations, and navigate to the nearest station. It also offers features like user authentication, profile management, and a clean, intuitive interface.
 ## Get started
 
-1. Install dependencies
+1. Use Geoapify
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. Install dependencies
+
+   ```bash
+   npm install
+   ```
+
+3. Start the app
 
    ```bash
     npx expo start
