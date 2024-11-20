@@ -3,7 +3,7 @@
 PumpTracker
 PumpTracker is a cross-platform mobile application developed using React Native and Expo. The app helps users locate nearby gas stations, view real-time updates about their locations, and navigate to the nearest station. It also offers features like user authentication, profile management, and a clean, intuitive interface.
 
-### **Features**
+# **Features**
 
 [x]**Splash Screen**
 - Displays the app logo briefly during the startup.
