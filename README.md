@@ -8,7 +8,7 @@ PumpTracker is a cross-platform mobile application developed using React Native 
 [x]**Splash Screen**
 - Displays the app logo briefly during the startup.
 
-[*]User Authentication: 
+- [x] User Authentication: 
 - Login and registration options using email or third-party providers (Google, Apple).
 
 [x] Real-Time Gas Station Mapping:
