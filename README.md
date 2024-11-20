@@ -24,6 +24,14 @@ PumpTracker is a cross-platform mobile application developed using React Native 
 - [x] Tab Navigation: 
    - Intuitive bottom navigation to switch between Home, PumpList, and Profile screens.
 
+# **Technologies Used**
+
+1. React Native with Expo
+2. Firebase
+3. MapView
+4. Expo Router
+5. TypeScript
+
 ## Get started
 1. Use Geoapify
 
