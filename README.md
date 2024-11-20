@@ -1,29 +1,28 @@
 # Welcome to PumpTracker 👋
 
-PumpTracker
 PumpTracker is a cross-platform mobile application developed using React Native and Expo. The app helps users locate nearby gas stations, view real-time updates about their locations, and navigate to the nearest station. It also offers features like user authentication, profile management, and a clean, intuitive interface.
 
 # **Features**
 
 - [x] **Splash Screen**
-- Displays the app logo briefly during the startup.
+   - Displays the app logo briefly during the startup.
 
 - [x] User Authentication: 
-- Login and registration options using email or third-party providers (Google, Apple).
+   - Login and registration options using email or third-party providers (Google, Apple).
 
-[x] Real-Time Gas Station Mapping:
-- Displays nearby gas stations on a map with interactive markers.
-- Provides location-specific filtering.
+- [x] Real-Time Gas Station Mapping:
+   - Displays nearby gas stations on a map with interactive markers.
+   - Provides location-specific filtering.
 
--[x] Pump List:
-- Lists all nearby gas stations in a scrollable flat list for easier browsing.
+- [x]  Pump List:
+   - Lists all nearby gas stations in a scrollable flat list for easier browsing.
 
--[x] Profile:
-- Shows user details (profile picture, email).
-- Allows users to log out securely.
+- [x] Profile:
+   - Shows user details (profile picture, email).
+   - Allows users to log out securely.
 
--[x] Tab Navigation: 
-- Intuitive bottom navigation to switch between Home, PumpList, and Profile screens.
+- [x] Tab Navigation: 
+   - Intuitive bottom navigation to switch between Home, PumpList, and Profile screens.
 
 ## Get started
 1. Use Geoapify
