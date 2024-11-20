@@ -26,29 +26,43 @@ PumpTracker is a cross-platform mobile application developed using React Native 
 
 # **Technologies Used**
 
-1. React Native with Expo
-2. Firebase
-3. MapView
-4. Expo Router
-5. TypeScript
+- React Native with Expo
+- Firebase
+- MapView
+- Expo Router
+- TypeScript
 
-## Get started
-1. Use Geoapify
+# **Setup Instructions**
+
+1. Prerequisites
+   
+  - Node.js installed on your system.
+  - Expo CLI installed globally (npm install -g expo-cli).
+  - A Firebase account for generating your own API keys.
+  - GeoApiFy account to use your own Autocomplete, Places, Place details API keys
+
+2. Clone the Repository
 
    ```bash
-   npm install
+   git clone https://github.com/wdolcine/PumpTracker.git
+   cd PumpTracker
    ```
 
-2. Install dependencies
+3. Install Dependencies
 
    ```bash
-   npm install
+    npm install
    ```
-
-3. Start the app
-
+   
+4. Configure API
+   
+   - Go to C:\YourPC\PumpTracker\constants\VariableConfigApi.ts
+   - Replace the Api keys place holder with your own apis
+     
+6. Run the App
+   
    ```bash
-    npx expo start
+    npm install
    ```
 
 In the output, you'll find options to open the app in a
