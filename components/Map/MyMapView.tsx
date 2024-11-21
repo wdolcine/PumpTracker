@@ -14,6 +14,7 @@ import {
   FetchGasStationsContextType,
 } from "@/services/fetchGasStations";
 import GasStationDetailsModal from "../GasStation/GasStationDetailsModal";
+// import { errorMsg } from "@/services/fetchGasStations";
 
 export default function MyMapView() {
   interface Location {
@@ -88,7 +89,6 @@ export default function MyMapView() {
             }}
             title="Your Location"
             description="Where you are"
-            // style={{ width: 60, height: 60 }}
           >
             <Image
               source={require("@/assets/images/currentLocation.png")}

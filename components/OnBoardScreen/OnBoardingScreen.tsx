@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Colors } from "@/constants/Colors";
 import { useAuth } from "@/context/useAuth";
 import { useRouter } from "expo-router";
@@ -23,11 +23,7 @@ export default function OnBoardingScreen() {
     if (currentUser) {
       router.navigate("/(tabs)/Home");
     } else {
-      useEffect(() => {
-        setTimeout(() => {
-          router.navigate("/(auth)/RegisterScreen");
-        }, 10000);
-      }, []);
+      router.navigate("/(auth)/RegisterScreen");
     }
   };
   const DoneBtn = ({ ...props }) => {

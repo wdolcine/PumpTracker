@@ -9,6 +9,10 @@ export default function AuthLayout() {
       <Stack>
         <Stack.Screen name="LoginScreen" options={{ headerShown: false }} />
         <Stack.Screen name="RegisterScreen" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="ForgotPassWordScreen"
+          options={{ headerShown: false }}
+        />
       </Stack>
     </AuthProvider>
   );

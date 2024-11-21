@@ -8,6 +8,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import * as WebBrowser from "expo-web-browser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -22,6 +23,8 @@ WebBrowser.maybeCompleteAuthSession();
 
 export interface AuthContextType {
   currentUser: User | null;
+  error: string | null;
+  clearError: () => void;
   login: (email: string, password: string) => Promise<void>;
   signup: (
     email: string,
@@ -29,6 +32,7 @@ export interface AuthContextType {
     extraData?: ExtraData
   ) => Promise<void>;
   logInWithGoogle: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -38,6 +42,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     androidClientId:
@@ -119,12 +124,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       await AsyncStorage.setItem("@user", JSON.stringify(user));
       setCurrentUser(user);
+      setError(null);
       router.replace("/(tabs)/Home");
     } catch (error) {
       if (error instanceof Error) {
         console.error("Signup Error :", error.message);
+        setError(error.message);
       } else {
-        console.error("An unknown error occured during signup");
+        // console.error("An unknown error occured during signup");
+        setError("An unknown error occured during signup");
       }
     }
   };
@@ -140,12 +148,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       await AsyncStorage.setItem("@user", JSON.stringify(user));
       setCurrentUser(user);
+      setError(null);
       router.replace("/(tabs)/Home");
     } catch (error) {
       if (error instanceof Error) {
         console.error("Login Error:", error.message);
+        setError(error.message);
       } else {
-        console.error("An unknown error occured during login");
+        // console.error("An unknown error occured during login");
+        setError("An unknown error occured during login");
       }
     }
   };
@@ -158,8 +169,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     } catch (error) {
       if (error instanceof Error) {
         console.error("Google Login Error:", error.message);
+        setError(error.message);
       } else {
-        console.error("An unknown error occurred during Google login");
+        // console.error("An unknown error occurred during Google login");
+        setError("An unknown error occured during Google Login");
+      }
+    }
+  };
+  const resetPassword = async (email: string) => {
+    try {
+      await sendPasswordResetEmail(Firebase_auth, email);
+      console.log("Password reset email sent");
+    } catch (error) {
+      if (error instanceof Error) {
+        // console.error("Error resetting password:", error.message);
+        setError(error.message);
+      } else {
+        // console.error("Unknown error during password reset");
+        setError("An unknown error occured during password reset");
       }
     }
   };
@@ -174,18 +201,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     } catch (error) {
       if (error instanceof Error) {
         console.error("Logout Error:", error.message);
+        setError(error.message);
       } else {
-        console.error("An unknown error occurred during logout");
+        // console.error("An unknown error occurred during logout");
+        setError("An unknown error occurred during logout");
       }
     }
+  };
+  const clearError = () => {
+    setError(null);
   };
 
   const value: AuthContextType = {
     currentUser,
+    error,
+    clearError,
     login,
     signup,
     logInWithGoogle,
     logout,
+    resetPassword,
   };
   return (
     <AuthContext.Provider value={value}>

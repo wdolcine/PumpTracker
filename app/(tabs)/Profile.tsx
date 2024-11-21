@@ -1,69 +1,73 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Switch,
   StyleSheet,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
-import { useRouter } from "expo-router";
 import { useAuth } from "@/context/useAuth";
-import { useTheme } from "@/hooks/themeContext";
+import { getUser } from "@/utils/getUser";
+import { User } from "@/utils";
 
 export default function Profile() {
-  // const [darkMode, setDarkMode] = useState(false);
-  const { colors, isDarkMode, toggleDarkMode } = useTheme();
-
-  const onToggleDarkMode = () => {
-    toggleDarkMode(!isDarkMode);
-  };
-
-  // const router = useRouter();
   const { logout, currentUser } = useAuth();
+  const [userData, setUserData] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (currentUser) {
+      getUser(currentUser).then((userData) => {
+        setUserData(userData ?? null);
+        setLoading(false);
+      });
+    }
+  }, [currentUser]);
 
   const handleLogOut = async () => {
     console.log("Logged out");
     await logout();
-    // router.navigate("/(auth)/LoginScreen");
   };
+
+  if (loading) {
+    return (
+      <View style={styles.Themedview}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
   return (
     <View style={styles.container}>
       <View style={styles.container1}>
-        {/* Back Button */}
-        {/* <TouchableOpacity style={styles.backButton}>
-        <Ionicons
-          name="arrow-back"
-          size={24}
-          color={Colors.light.tabIconDefault}
-        />
-      </TouchableOpacity> */}
-
         {/* Title */}
         <Text style={styles.title}>My Account</Text>
 
         {/* Profile Section */}
         <View style={styles.profileContainer}>
-          {currentUser?.firstName &&
-          currentUser.lastName &&
-          currentUser.email ? (
+          {currentUser?.firstName ||
+          (userData?.firstName && currentUser?.lastName) ||
+          (userData?.lastName && currentUser?.email) ||
+          userData?.email ? (
             <>
               <Image
                 source={{
                   uri:
-                    currentUser.profileImage || "/assets/images/DSC_3693.jpg",
+                    currentUser?.profileImage || "/assets/images/DSC_3693.jpg",
                 }}
                 style={styles.profileImage}
               />
               <View style={styles.profileDetails}>
                 <Text style={styles.name}>
-                  {currentUser.lastName}
-                  {""}
-                  {currentUser.firstName}
+                  {userData?.lastName || currentUser?.lastName}
+                  {"\t"}
+                  {userData?.firstName || currentUser?.firstName}
                 </Text>
-                <Text style={styles.email}>{currentUser.email}</Text>
+                <Text style={styles.email}>
+                  {userData?.email || currentUser?.email}
+                </Text>
               </View>
             </>
           ) : (
@@ -155,6 +159,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.lightColor.background,
     padding: 20,
+  },
+  Themedview: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   container1: {
     paddingTop: 50,

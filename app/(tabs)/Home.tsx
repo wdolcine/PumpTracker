@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, KeyboardAvoidingView } from "react-native";
+import { View, KeyboardAvoidingView } from "react-native";
 import React from "react";
 import MyMapView from "@/components/Map/MyMapView";
 
@@ -11,7 +11,5 @@ const Home: React.FC = () => {
     </KeyboardAvoidingView>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default Home;

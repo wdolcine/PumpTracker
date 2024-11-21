@@ -9,4 +9,9 @@ export const firebaseVariables = {
 
 };
 
-export const googlePlaceAutoCompleteId = "87abf5d295msh20298c5e7f80999p14eb62jsn48e74a768ff8";
+export const GEOAPIFY_API_KEY_AutoComplete : string = "a5f4346a71ce42538e5a627d2f4cf6f3";
+export const GEOAPIFY_API_KEY_Places : string = "a4e1b1fa978f4758b3b8db8005e8a96f";
+export const GEOAPIFY_API_KEY_Places_Details : string = "57e75487a30840208d19ba28227d9fd1";
+
+
+

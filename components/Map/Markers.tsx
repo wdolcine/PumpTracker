@@ -26,13 +26,10 @@ const Markers: React.FC<MarkersProps> = ({
       coordinate={{ latitude, longitude }}
       title={title}
       description={address}
-      image={closedIcon}
+      image={openIcon}
       onPress={onPress}
       style={styles.marker}
-    >
-      {/* <GasIcon name="gas-pump" size={24} color="black" /> */}
-      {/* <Image src={openIcon}></Image> */}
-    </Marker>
+    ></Marker>
   );
 };
 

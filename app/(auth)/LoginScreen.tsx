@@ -6,14 +6,13 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
-  KeyboardAvoidingView,
   View,
   Text,
+  ScrollView,
+  Alert,
 } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useAuth } from "@/context/useAuth";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -21,8 +20,19 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isValid, setIsValid] = useState<boolean>(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
-  const { login, logInWithGoogle } = useAuth();
+  const { login, logInWithGoogle, clearError, error } = useAuth();
+
+  useEffect(() => {
+    if (error) {
+      console.error(error);
+    }
+    return () => {
+      clearError();
+    };
+  }, [error]);
+
   const validateForm = () => {
     if (email.trim() !== "" && password.trim() !== "") {
       setIsValid(true);
@@ -43,86 +53,117 @@ export default function LoginScreen() {
   };
   const handleLogin = async () => {
     console.log("Logged in");
-    // router.navigate("/(tabs)/Home");
-
+    setLoading(true);
     await login(email, password);
+
+    setLoading(false);
   };
   const handleForgotPassword = async () => {
-    console.log("Password Forgetten");
+    router.push("../(auth)/ForgotPassWordScreen");
   };
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome back!</Text>
-      <Text style={styles.subtitle}>Enter your credentials to continue.</Text>
+    <ScrollView style={styles.container1}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Welcome back!</Text>
+        <Text style={styles.subtitle}>Enter your credentials to continue.</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="exemple@gmail.com"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry={true}
-      />
-
-      <TouchableOpacity onPress={handleForgotPassword}>
-        <Text style={styles.forgotPassword}>Forgot your password?</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[
-          styles.loginButton,
-          { backgroundColor: isValid ? "#007bff" : "#cccccc" },
-        ]}
-        onPress={handleLogin}
-        disabled={!isValid || loading}
-      >
-        <Text style={styles.loginText}>
-          {loading ? "Logging..." : "Log In"}
-        </Text>
-      </TouchableOpacity>
-
-      <Text style={styles.orText}>Or connect via</Text>
-
-      <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialButton} onPress={handleGoogle}>
-          <FontAwesome5
-            name="google"
-            type="font-awesome"
-            color="#EA4335"
-            size={24}
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="exemple@gmail.com"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.Footer}>
-        <Text style={styles.footerText}>
-          By logging, you are agreeing with our <Text>{"\n"}</Text>
-          <Text style={styles.link}>Terms of Use </Text> and
-          {"  "}
-          <Text style={styles.link}>Privacy Policy</Text>
-        </Text>
+        </View>
 
-        <TouchableOpacity>
-          <Text style={styles.footerText} onPress={NavigateRegister}>
-            No account yet?{" "}
-            <Link href="../(auth)/RegisterScreen" style={styles.link}>
-              Register
-            </Link>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={[styles.input, { flex: 1 }]}
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!passwordVisible}
+          />
+          <TouchableOpacity
+            onPress={() => setPasswordVisible(!passwordVisible)}
+            style={styles.eyeIcon}
+          >
+            <FontAwesome5
+              name={passwordVisible ? "eye" : "eye-slash"}
+              size={15}
+              color="#555"
+            />
+          </TouchableOpacity>
+        </View>
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
+        <TouchableOpacity onPress={handleForgotPassword}>
+          <Text style={styles.forgotPassword}>Forgot your password?</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.loginButton,
+            { backgroundColor: isValid ? "#007bff" : "#cccccc" },
+          ]}
+          onPress={handleLogin}
+          disabled={!isValid || loading}
+        >
+          <Text style={styles.loginText}>
+            {loading ? "Logging..." : "Log In"}
           </Text>
         </TouchableOpacity>
+
+        <Text style={styles.orText}>Or connect via</Text>
+
+        <View style={styles.socialContainer}>
+          <TouchableOpacity style={styles.socialButton} onPress={handleGoogle}>
+            <FontAwesome5
+              name="google"
+              type="font-awesome"
+              color="#EA4335"
+              size={24}
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.Footer}>
+          <Text style={styles.footerText}>
+            By logging, you are agreeing with our <Text>{"\n"}</Text>
+            <Text style={styles.link}>Terms of Use </Text> and
+            {"  "}
+            <Text style={styles.link}>Privacy Policy</Text>
+          </Text>
+
+          <TouchableOpacity>
+            <Text style={styles.footerText} onPress={NavigateRegister}>
+              No account yet?{" "}
+              <Link href="../(auth)/RegisterScreen" style={styles.link}>
+                Register
+              </Link>
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 // Styles for the login screen
 const styles = StyleSheet.create({
+  container1: {
+    flex: 1,
+    backgroundColor: Colors.lightColor.background,
+    // justifyContent: "center",
+    // alignItems: "center",
+    minHeight: "auto",
+    paddingTop: 60,
+  },
+  errorText: {
+    color: "red",
+    marginVertical: 5,
+  },
   container: {
     flex: 1,
     backgroundColor: Colors.lightColor.background,
@@ -130,7 +171,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     minHeight: "auto",
-    marginTop: 40,
+    paddingTop: 40,
   },
   title: {
     fontSize: 24,
@@ -154,7 +195,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    backgroundColor: Colors.lightColor.textButton,
+    borderRadius: 30,
+    marginVertical: 10,
     elevation: 2,
+  },
+  eyeIcon: {
+    padding: 10,
+    marginRight: 10,
   },
   forgotPassword: {
     alignSelf: "flex-end",

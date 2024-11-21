@@ -8,6 +8,8 @@ export const getUser = async (user: User) => {
        const userDoc = doc(Firebase_db, "users", user.uid);
 
        const userSnap = await getDoc(userDoc);
+       const infos = userSnap.metadata
+       console.log(infos);
 
        if (userSnap.exists()) {
 

@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { GEOAPIFY_API_KEY_AutoComplete } from "@/constants/VariableConfigApi";
 
 interface Location {
   lat: number;
@@ -38,7 +39,7 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
       setSuggestions([]);
     };
 
-    const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${input}&apiKey=${GEOAPIFY_API_KEY}`;
+    const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${input}&apiKey=${GEOAPIFY_API_KEY_AutoComplete}`;
 
     try {
       const response = await fetch(url, { method: "GET" });
@@ -52,7 +53,8 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
       }));
       setSuggestions(results);
     } catch (error) {
-      console.error("Error fetching suggestions:", error);
+      // console.error("Error fetching suggestions:", error);
+      setQuery("Can't find location suggestions");
     }
   };
 

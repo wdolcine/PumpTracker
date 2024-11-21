@@ -1,8 +1,3 @@
-// import {
-//   DarkTheme,
-//   DefaultTheme,
-//   ThemeProvider,
-// } from "@react-navigation/native";
 import * as Font from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -13,7 +8,6 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { UserLocationProvider } from "@/context/UserLocationContext";
 import { useAuth } from "@/context/useAuth";
-import { ThemeProvider } from "@/hooks/themeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { FetchGasStationsProvider } from "@/services/fetchGasStations";
 import ProtectedRoute from "@/components/navigation/ProtectedRoute";
@@ -51,16 +45,14 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <ThemeProvider>
-        <UserLocationProvider>
-          <FetchGasStationsProvider>
-            <ProtectedRoute>
-              <AppNavigation />
-            </ProtectedRoute>
-          </FetchGasStationsProvider>
-          <StatusBar style="dark" />
-        </UserLocationProvider>
-      </ThemeProvider>
+      <UserLocationProvider>
+        <FetchGasStationsProvider>
+          <ProtectedRoute>
+            <AppNavigation />
+          </ProtectedRoute>
+        </FetchGasStationsProvider>
+        <StatusBar style="dark" />
+      </UserLocationProvider>
     </AuthProvider>
   );
 }

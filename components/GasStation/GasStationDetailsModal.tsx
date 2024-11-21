@@ -9,6 +9,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import { GEOAPIFY_API_KEY_Places_Details } from "@/constants/VariableConfigApi";
 
 interface GasStationDetailsModalProps {
   isVisible: boolean;
@@ -34,7 +35,7 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
 
   const fetchPlaceDetails = async (placeId: string) => {
     setLoading(true);
-    const url = `https://api.geoapify.com/v2/place-details?id=${placeId}&apiKey=${GEOAPIFY_API_KEY}`;
+    const url = `https://api.geoapify.com/v2/place-details?id=${placeId}&apiKey=${GEOAPIFY_API_KEY_Places_Details}`;
 
     try {
       const response = await fetch(url, { method: "GET" });
@@ -42,7 +43,7 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
 
       if (data.features && data.features.length > 0) {
         const feature = data.features[0].properties;
-    
+
         setDetails({
           name: feature.name || "Gas Station",
           address: feature.formatted || "N/A",
@@ -53,7 +54,6 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
           ],
           fuel_options: feature.fuel_options || {},
         });
-       ;
         console.log("API Response:", data.features[0].properties);
       } else {
         console.error("No details found for the selected gas station.");

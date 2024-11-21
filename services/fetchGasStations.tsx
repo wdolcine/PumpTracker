@@ -9,6 +9,7 @@ import React, {
   useEffect,
   useContext,
 } from "react";
+import { GEOAPIFY_API_KEY_Places } from "@/constants/VariableConfigApi";
 
 export interface FetchGasStationsContextType {
   gasStations: any[];
@@ -28,7 +29,6 @@ export const FetchGasStationsProvider: React.FC<{ children: ReactNode }> = ({
     UserLocationContext
   ) as LocationContextType;
 
-  const fetchPlaces = async () => {};
   useEffect(() => {
     if (latitude && longitude) {
       fetchNearbyGasStations(latitude, longitude);
@@ -38,7 +38,7 @@ export const FetchGasStationsProvider: React.FC<{ children: ReactNode }> = ({
   }, [latitude, longitude]);
 
   const fetchNearbyGasStations = async (lat: number, lng: number) => {
-    const url = `https://api.geoapify.com/v2/places?categories=service.vehicle.fuel&filter=circle:${lng},${lat},5000&bias=proximity:${lng},${lat}&limit=20&apiKey=${GEOAPIFY_API_KEY}`;
+    const url = `https://api.geoapify.com/v2/places?categories=service.vehicle.fuel&filter=circle:${lng},${lat},5000&bias=proximity:${lng},${lat}&limit=20&apiKey=${GEOAPIFY_API_KEY_Places}`;
 
     try {
       const response = await fetch(url, { method: "GET" });
@@ -56,6 +56,7 @@ export const FetchGasStationsProvider: React.FC<{ children: ReactNode }> = ({
       console.log(results);
     } catch (error) {
       console.error("Error fetching gas stations:", error);
+      // setErrorMsg("Error fetching gas stations");
     }
   };
 
