@@ -23,7 +23,7 @@ export default function OnBoardingScreen() {
     if (currentUser) {
       router.navigate("/(tabs)/Home");
     } else {
-      router.navigate("/(auth)/RegisterScreen");
+      router.navigate("/(tabs)/Home");
     }
   };
   const DoneBtn = ({ ...props }) => {

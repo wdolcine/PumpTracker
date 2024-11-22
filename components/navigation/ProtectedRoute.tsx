@@ -12,9 +12,9 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (currentUser === null) {
-      router.replace("/"); // Redirect to onboarding if not logged in
+      router.replace("/");
     } else if (currentUser) {
-      router.replace("/(tabs)/Home"); // Redirect to Home if logged in
+      router.replace("/(tabs)/Home");
     }
   }, [currentUser]);
 

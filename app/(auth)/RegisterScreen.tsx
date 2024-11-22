@@ -12,7 +12,6 @@ import {
 import MyCheckbox from "@/components/Mycheckbox";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Link } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
 import { useAuth } from "@/context/useAuth";
 
@@ -27,8 +26,6 @@ const RegisterScreen = () => {
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmpasswordVisible, setconfirmPasswordVisible] = useState(false);
-
-  // const auth = Firebase_auth;
 
   const { signup, logInWithGoogle, error, clearError } = useAuth();
 
@@ -53,7 +50,7 @@ const RegisterScreen = () => {
   }, [lastName, firstName, email, password, confirmPassword, agreeTerms]);
 
   const handleGoogle = async () => {
-    console.log("Google Logged");
+    // console.log("Google Logged");
     setLoading(true);
     await logInWithGoogle();
     setLoading(false);

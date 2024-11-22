@@ -1,14 +1,12 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import React from "react";
 import { Marker } from "react-native-maps";
-import GasIcon from "@expo/vector-icons/FontAwesome6";
 
 interface MarkersProps {
   latitude: number;
   longitude: number;
   title: string;
   address: string;
-  // status: "open" | "closed";
   onPress: () => void;
 }
 

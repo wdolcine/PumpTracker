@@ -44,16 +44,16 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <UserLocationProvider>
+    <UserLocationProvider>
+      <AuthProvider>
         <FetchGasStationsProvider>
           <ProtectedRoute>
             <AppNavigation />
           </ProtectedRoute>
         </FetchGasStationsProvider>
         <StatusBar style="dark" />
-      </UserLocationProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </UserLocationProvider>
   );
 }
 const AppNavigation = () => {
@@ -62,11 +62,8 @@ const AppNavigation = () => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      {currentUser ? (
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      ) : (
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      )}
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="+not-found" />
     </Stack>
   );

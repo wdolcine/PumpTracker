@@ -1,5 +1,16 @@
-import React, { createContext, useState, ReactNode, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import { useRouter } from "expo-router";
+import { UserLocationContext } from "./UserLocationContext";
+import {
+  updateUserLocation,
+  updateUserLocationRefInFirestore,
+} from "../utils/addUser";
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
@@ -44,9 +55,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { latitude, longitude } = useContext(UserLocationContext) ?? {};
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     androidClientId:
-      "19833993261-ocr5md15t76qiqh0opmv1tf005cpnt34.apps.googleusercontent.com",
+      "729641409796-1ooegnogn8lu5tinnfre6mgchlj6gnui.apps.googleusercontent.com",
   });
 
   const getLocalUser = async () => {
@@ -82,36 +94,79 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   useEffect(() => {
-    if (response?.type === "success") {
-      const { id_token } = response.params;
-      const credential = GoogleAuthProvider.credential(id_token);
-      signInWithCredential(Firebase_auth, credential)
-        .then(async (userCredential) => {
-          const user = convertFirebaseUserToUser(userCredential.user);
+    const handleGoogleLogin = async () => {
+      const { latitude, longitude } = useContext(UserLocationContext) ?? {};
+
+      if (response?.type === "success") {
+        try {
+          const { id_token } = response.params;
+          const credential = GoogleAuthProvider.credential(id_token);
+          const userCredential = await signInWithCredential(
+            Firebase_auth,
+            credential
+          );
           const profileImage = userCredential.user.photoURL;
+
+          const user = convertFirebaseUserToUser(userCredential.user);
+
+          if (latitude && longitude) {
+            await updateUserLocation(user.uid, { latitude, longitude });
+          }
+
           await addUser({ ...user, profileImage });
 
-          await AsyncStorage.setItem("@user", JSON.stringify(user));
+          await updateUserLocationRefInFirestore(
+            user.uid,
+            `/locations/${user.uid}`
+          );
+
+          await AsyncStorage.setItem("@users", JSON.stringify(user));
           setCurrentUser(user);
           router.replace("/(tabs)/Home");
-        })
-        .catch((error) => {
+        } catch (error) {
           if (error instanceof Error) {
-            console.error("Error signing in with credential:", error.message);
+            console.error("Error signing with Google", error.message);
+            setError(error.message);
           } else {
-            console.error(
-              "An unknown error occurred during signing in with credential"
-            );
+            setError("An unknown error occured during Google login");
           }
-        });
-    }
+        }
+      }
+    };
+    handleGoogleLogin();
   }, [response]);
+
+  // if (response?.type === "success") {
+  //   const { id_token } = response.params;
+  //   const credential = GoogleAuthProvider.credential(id_token);
+  //   signInWithCredential(Firebase_auth, credential)
+  //     .then(async (userCredential) => {
+  //       const user = convertFirebaseUserToUser(userCredential.user);
+  //       const profileImage = userCredential.user.photoURL;
+  //       await addUser({ ...user, profileImage });
+
+  //       await AsyncStorage.setItem("@user", JSON.stringify(user));
+  //       setCurrentUser(user);
+  //       router.replace("/(tabs)/Home");
+  //     })
+  //     .catch((error) => {
+  //       if (error instanceof Error) {
+  //         console.error("Error signing in with Google:", error.message);
+  //       } else {
+  //         console.error(
+  //           "An unknown error occurred during signing in with Google"
+  //         );
+  //       }
+  //     });
+  // }
 
   const signup = async (
     email: string,
     password: string,
     extraData?: ExtraData
   ) => {
+    // const { latitude, longitude } = useContext(UserLocationContext) ?? {};
+
     try {
       const userCredential = await createUserWithEmailAndPassword(
         Firebase_auth,
@@ -121,6 +176,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const user = convertFirebaseUserToUser(userCredential.user);
 
       await addUser(user, extraData);
+
+      if (latitude && longitude) {
+        await updateUserLocation(user.uid, { latitude, longitude });
+
+        await updateUserLocationRefInFirestore(
+          user.uid,
+          `/locations/${user.uid}`
+        );
+      }
 
       await AsyncStorage.setItem("@user", JSON.stringify(user));
       setCurrentUser(user);
@@ -146,13 +210,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       );
       const user = convertFirebaseUserToUser(userCredential.user);
 
+      if (latitude && longitude) {
+        await updateUserLocation(user.uid, { latitude, longitude });
+      }
+
+      await updateUserLocationRefInFirestore(
+        user.uid,
+        `/locations/${user.uid}`
+      );
+
       await AsyncStorage.setItem("@user", JSON.stringify(user));
       setCurrentUser(user);
       setError(null);
       router.replace("/(tabs)/Home");
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Login Error:", error.message);
         setError(error.message);
       } else {
         // console.error("An unknown error occured during login");
@@ -164,8 +236,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   // Google Login
   const logInWithGoogle = async () => {
     try {
-      console.log("Logging with google");
       await promptAsync();
+      console.log("Logging with google");
     } catch (error) {
       if (error instanceof Error) {
         console.error("Google Login Error:", error.message);

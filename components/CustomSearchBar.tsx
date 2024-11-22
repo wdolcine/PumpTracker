@@ -10,34 +10,37 @@ import {
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { GEOAPIFY_API_KEY_AutoComplete } from "@/constants/VariableConfigApi";
+import { router } from "expo-router";
 
 interface Location {
   lat: number;
   lon: number;
 }
-const GEOAPIFY_API_KEY: string = "a5f4346a71ce42538e5a627d2f4cf6f3";
-
 interface CustomSearchBarProps {
   onLocationSelected: (location: Location) => void;
+  disabled?: boolean;
+  onClear?: () => void;
 }
 
 const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
   onLocationSelected,
+  disabled = false,
+  onClear,
 }) => {
   const [query, setQuery] = useState<string>("");
   const [suggestions, setSuggestions] = useState<
     Array<{ name: string; place_id: string; lat: number; lon: number }>
   >([]);
 
+  const handleClear = () => {
+    onClear?.();
+  };
+
   const fetchSuggestions = async (input: string) => {
-    if (input.length < 3) {
+    if (disabled || input.length < 3) {
       setSuggestions([]);
       return;
     }
-    const clearSearch = () => {
-      setQuery("");
-      setSuggestions([]);
-    };
 
     const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${input}&apiKey=${GEOAPIFY_API_KEY_AutoComplete}`;
 
@@ -74,6 +77,15 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
           onChangeText={(text) => {
             setQuery(text);
             fetchSuggestions(text);
+            if (text === "") {
+              handleClear();
+            }
+          }}
+          // editable={!disabled}
+          onPress={() => {
+            if (disabled) {
+              router.push("/(auth)/LoginScreen");
+            }
           }}
         />
         {query.length > 0 && (
@@ -94,13 +106,15 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
       </View>
       <FlatList
         data={suggestions}
-        keyExtractor={(item) => item.place_id}
+        keyExtractor={(item, index) => `${item}-${index}`}
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => {
-              onLocationSelected({ lat: item.lat, lon: item.lon });
-              setQuery(item.name);
-              setSuggestions([]); // Clear suggestions after selection
+              if (!disabled) {
+                onLocationSelected({ lat: item.lat, lon: item.lon });
+                setQuery(item.name);
+                setSuggestions([]);
+              }
             }}
             style={styles.suggestionItem}
           >
@@ -108,6 +122,11 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
           </TouchableOpacity>
         )}
       />
+      {disabled && (
+        <Text style={styles.disabledMessage}>
+          Login required to search locations.
+        </Text>
+      )}
     </View>
   );
 };
@@ -120,6 +139,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 10,
+    width: "100%",
     display: "flex",
   },
   container2: {
@@ -129,6 +149,7 @@ const styles = StyleSheet.create({
     height: 40,
     paddingHorizontal: 10,
     marginBottom: 5,
+    // width: "95%",
   },
   suggestionItem: {
     paddingVertical: 10,
@@ -138,6 +159,14 @@ const styles = StyleSheet.create({
   },
   suggestionText: {
     fontSize: 16,
+    fontFamily: "Outfit-Regular",
+  },
+  disabledMessage: {
+    paddingLeft: 10,
+    fontSize: 14,
+    fontFamily: "Outfit-Regular",
+    color: "red",
+    textAlign: "left",
   },
 });
 

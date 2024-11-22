@@ -1,6 +1,13 @@
-import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  Alert,
+} from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import MapViewStyle from "@/constants/MapViewStyle.json";
 import { Colors } from "@/constants/Colors";
 import {
@@ -14,7 +21,8 @@ import {
   FetchGasStationsContextType,
 } from "@/services/fetchGasStations";
 import GasStationDetailsModal from "../GasStation/GasStationDetailsModal";
-// import { errorMsg } from "@/services/fetchGasStations";
+import { useAuth } from "@/context/useAuth";
+import { useRouter } from "expo-router";
 
 export default function MyMapView() {
   interface Location {
@@ -26,13 +34,22 @@ export default function MyMapView() {
     UserLocationContext
   ) as LocationContextType;
 
-  const { gasStations, fetchNearbyGasStations } = useContext(
-    FetchGasStationsContext
-  ) as FetchGasStationsContextType;
+  const {
+    gasStations,
+    fetchNearbyGasStations,
+    errorMsgGasStations,
+    clearErrorGasStations,
+  } = useContext(FetchGasStationsContext) as FetchGasStationsContextType;
 
-  const { latitude, longitude } = useContext(
-    UserLocationContext
-  ) as LocationContextType;
+  const { latitude, longitude, clearErrorLocation, errorMsgLocation } =
+    userLocationContext || {};
+
+  const locationAvailable = latitude !== undefined && longitude !== undefined;
+
+  const { currentUser } = useAuth();
+  const router = useRouter();
+
+  const mapRef = useRef<MapView>(null);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedStation, setSelectedStation] = useState<any | null>(null);
@@ -47,7 +64,70 @@ export default function MyMapView() {
     setModalVisible(false);
   };
 
-  const region: Region | undefined = userLocationContext
+  useEffect(() => {
+    if (errorMsgLocation || errorMsgGasStations) {
+      Alert.alert(
+        "Location error",
+        errorMsgLocation ? errorMsgLocation : errorMsgGasStations
+      );
+      console.log(errorMsgLocation ? errorMsgLocation : errorMsgGasStations);
+    }
+    return () => {
+      {
+        errorMsgLocation ? clearErrorLocation() : clearErrorGasStations;
+      }
+    };
+  }, [errorMsgLocation, errorMsgGasStations]);
+
+  const handleLocationSelected = async (location: Location) => {
+    if (!currentUser) {
+      Alert.alert("Authentication Required", "Please log in to search.");
+      router.push("/(auth)/LoginScreen");
+      return;
+    }
+    mapRef.current?.animateCamera(
+      {
+        center: {
+          latitude: location.lat,
+          longitude: location.lon,
+        },
+        zoom: 15,
+      },
+      { duration: 1000 }
+    );
+    await fetchNearbyGasStations(location.lat, location.lon);
+    console.log("Selected Location:", location);
+  };
+
+  const handleMarkerPress = (lat: number, lon: number) => {
+    mapRef.current?.animateCamera(
+      {
+        center: {
+          latitude: lat,
+          longitude: lon,
+        },
+        zoom: 16,
+      },
+      { duration: 1000 }
+    );
+  };
+
+  const resetToUserLocation = () => {
+    if (locationAvailable) {
+      mapRef.current?.animateCamera(
+        {
+          center: {
+            latitude,
+            longitude,
+          },
+          zoom: 14,
+        },
+        { duration: 1000 }
+      );
+    }
+  };
+
+  const region: Region | undefined = locationAvailable
     ? {
         latitude: latitude,
         longitude: longitude,
@@ -56,7 +136,7 @@ export default function MyMapView() {
       }
     : undefined;
 
-  if (!userLocationContext) {
+  if (!locationAvailable) {
     return (
       <View style={styles.View}>
         <ActivityIndicator size="large" color={Colors.lightColor.tintColor} />
@@ -66,20 +146,22 @@ export default function MyMapView() {
       </View>
     );
   }
-  const handleLocationSelected = async (location: Location) => {
-    await fetchNearbyGasStations(location.lat, location.lon);
-    console.log("Selected Location:", location);
-  };
+
   return (
     <View>
       <View style={styles.containerHeader}>
-        <CustomSearchBar onLocationSelected={handleLocationSelected} />
+        <CustomSearchBar
+          onLocationSelected={handleLocationSelected}
+          disabled={!currentUser}
+          onClear={resetToUserLocation}
+        />
       </View>
       {latitude && longitude && (
         <MapView
+          ref={mapRef}
           style={styles.map}
           provider={PROVIDER_GOOGLE}
-          customMapStyle={MapViewStyle}
+          // customMapStyle={MapViewStyle}
           region={region}
         >
           <Marker
@@ -89,13 +171,17 @@ export default function MyMapView() {
             }}
             title="Your Location"
             description="Where you are"
+            onPress={() => {
+              handleMarkerPress(latitude, longitude);
+            }}
           >
             <Image
               source={require("@/assets/images/currentLocation.png")}
               style={{ height: 50, width: 35 }}
             />
           </Marker>
-          {gasStations &&
+          {currentUser &&
+            gasStations &&
             gasStations.map((station, index) => (
               <Markers
                 key={`${station.place_id}-${index}`}
@@ -105,11 +191,13 @@ export default function MyMapView() {
                 address={station.address}
                 onPress={() => {
                   openModal(station.place_id);
+                  handleMarkerPress(station.lat, station.lon);
                 }}
               />
             ))}
         </MapView>
       )}
+
       <GasStationDetailsModal
         isVisible={modalVisible}
         onClose={closeModal}
@@ -137,5 +225,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: "100%",
+  },
+  message: {
+    fontSize: 16,
+    color: Colors.lightColor.iconDefault,
+    textAlign: "center",
   },
 });

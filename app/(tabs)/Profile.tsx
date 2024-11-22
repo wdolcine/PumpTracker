@@ -12,6 +12,7 @@ import { Colors } from "@/constants/Colors";
 import { useAuth } from "@/context/useAuth";
 import { getUser } from "@/utils/getUser";
 import { User } from "@/utils";
+import { router } from "expo-router";
 
 export default function Profile() {
   const { logout, currentUser } = useAuth();
@@ -25,11 +26,21 @@ export default function Profile() {
         setLoading(false);
       });
     }
+    if (currentUser?.profileImage === null || userData?.profileImage === null) {
+      console.log("no image found");
+    } else {
+      console.log("Image:", currentUser?.profileImage);
+    }
+    setLoading(false);
   }, [currentUser]);
 
   const handleLogOut = async () => {
-    console.log("Logged out");
-    await logout();
+    if (currentUser) {
+      console.log("Logged out");
+      await logout();
+    } else {
+      router.push("/(auth)/LoginScreen");
+    }
   };
 
   if (loading) {
@@ -47,22 +58,21 @@ export default function Profile() {
 
         {/* Profile Section */}
         <View style={styles.profileContainer}>
-          {currentUser?.firstName ||
-          (userData?.firstName && currentUser?.lastName) ||
-          (userData?.lastName && currentUser?.email) ||
-          userData?.email ? (
+          {userData || currentUser ? (
             <>
               <Image
                 source={{
                   uri:
-                    currentUser?.profileImage || "/assets/images/DSC_3693.jpg",
+                    userData?.profileImage ||
+                    currentUser?.profileImage ||
+                    undefined,
                 }}
                 style={styles.profileImage}
               />
+
               <View style={styles.profileDetails}>
                 <Text style={styles.name}>
-                  {userData?.lastName || currentUser?.lastName}
-                  {"\t"}
+                  {userData?.lastName || currentUser?.lastName}{" "}
                   {userData?.firstName || currentUser?.firstName}
                 </Text>
                 <Text style={styles.email}>
@@ -73,46 +83,19 @@ export default function Profile() {
           ) : (
             <Text>No user logged in</Text>
           )}
-          <TouchableOpacity style={styles.editIcon}>
+          {/* <TouchableOpacity style={styles.editIcon}>
             <Ionicons
               name="create-outline"
               size={20}
               color={Colors.lightColor.iconSelected}
             />
-          </TouchableOpacity>
-        </View>
-
-        {/* Switch dark and light mode */}
-        <View>
-          {/* <TouchableOpacity onPress={onToggleDarkMode}>
-            <Switch
-              value={isDarkMode}
-              onValueChange={(value) => {
-                toggleDarkMode(value);
-              }}
-              style={{ shadowColor: Colors.lightColor.text }}
-            ></Switch>
           </TouchableOpacity> */}
         </View>
 
         {/* Quick Link */}
         <View style={styles.quickLinkContainer}>
           <Text style={styles.quickLinkText}>QUICK LINKS</Text>
-          {/* <View style={styles.quickLink}>
-            <Ionicons
-              name="time-outline"
-              size={20}
-              color={Colors.lightColor.iconDefault}
-            />
-            <Text style={styles.quickLinkLabel}>History</Text>
-            <TouchableOpacity>
-              <Ionicons
-                name="chevron-forward"
-                size={20}
-                color={Colors.lightColor.iconDefault}
-              />
-            </TouchableOpacity>
-          </View> */}
+
           <View style={styles.quickLink}>
             <Ionicons
               name="shield-outline"
@@ -147,7 +130,9 @@ export default function Profile() {
 
         {/* Logout Button */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogOut}>
-          <Text style={styles.logoutText}>Log out</Text>
+          <Text style={styles.logoutText}>
+            {currentUser ? "Log out" : "Log in"}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -181,13 +166,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: Colors.lightColor.textButton,
-    padding: 15,
+    padding: 5,
     borderRadius: 10,
     marginBottom: 20,
   },
   profileImage: {
-    width: 50,
-    height: 50,
+    width: 80,
+    height: 80,
     borderRadius: 25,
   },
   profileDetails: {

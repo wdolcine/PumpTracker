@@ -9,7 +9,6 @@ import {
   View,
   Text,
   ScrollView,
-  Alert,
 } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useAuth } from "@/context/useAuth";
@@ -26,7 +25,7 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (error) {
-      console.error(error);
+      console.log(error);
     }
     return () => {
       clearError();

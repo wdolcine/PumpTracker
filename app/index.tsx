@@ -2,25 +2,26 @@ import { Link, useRouter } from "expo-router";
 import { StyleSheet, ActivityIndicator, Image, View, Text } from "react-native";
 import { Colors } from "@/constants/Colors";
 import React, { useEffect } from "react";
+import { useAuth } from "@/context/useAuth";
 import "react-native-get-random-values";
 import OnBoardingScreen from "@/components/OnBoardScreen/OnBoardingScreen";
 
 export default function Page() {
-  const router = useRouter();
+  // const router = useRouter();
+  // const { currentUser } = useAuth();
 
   // useEffect(() => {
   //   setTimeout(() => {
-  //     router.navigate("/(auth)/LoginScreen"); // Navigate to the next splash screen
-  //   }, 10000); // Show this screen for 2 seconds
+  //     if (currentUser) {
+  //       router.navigate("/(tabs)/Home");
+  //     } else {
+  //       router.navigate("/");
+  //     }
+  //   }, 2000); // Show this screen for 2 seconds
   // }, []);
 
   return (
     <View style={styles.container}>
-      {/* <Image
-        source={require("../assets/images/icon.png")}
-        style={{ height: 330, width: 330 }}
-      />
-      <Link href="../(tabs)/Home">Home</Link> */}
       <OnBoardingScreen />
     </View>
   );

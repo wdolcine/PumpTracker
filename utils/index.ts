@@ -5,6 +5,7 @@ export interface User{
     lastName: string;
     profileImage:string | null;
     createdAt: Date;
+    locationRef?: string;
 }
 export interface ExtraData{
     firstName?: string;

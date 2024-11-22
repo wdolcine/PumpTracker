@@ -26,6 +26,9 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
 }) => {
   const [details, setDetails] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
+  const [errorMsgGsDetails, seterrorMsgGsDetails] = useState<
+    string | undefined
+  >(undefined);
 
   useEffect(() => {
     if (placeId) {
@@ -56,18 +59,46 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
         });
         console.log("API Response:", data.features[0].properties);
       } else {
-        console.error("No details found for the selected gas station.");
+        // console.error("No details found for the selected gas station.");
+        seterrorMsgGsDetails("No details found for the selected gas station.");
         setDetails(null);
       }
     } catch (error) {
-      console.error("Error fetching gas station details:", error);
+      // console.error("Error fetching gas station details:", error);
+      seterrorMsgGsDetails(`Error fetching gas station details:${error}`);
       setDetails(null);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!placeId) return null;
+  if (!placeId || errorMsgGsDetails) {
+    return (
+      <Modal
+        visible={isVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={onClose}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {loading ? (
+              <ActivityIndicator
+                size="large"
+                color={Colors.lightColor.tintColor}
+              />
+            ) : (
+              <Text>
+                {errorMsgGsDetails
+                  ? errorMsgGsDetails
+                  : `${placeId}? Can't find details for ${placeId} : No placeId found`}
+              </Text>
+            )}
+          </View>
+        </View>
+      </Modal>
+    );
+  }
 
   return (
     <Modal

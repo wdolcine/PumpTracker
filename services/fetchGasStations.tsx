@@ -14,6 +14,8 @@ import { GEOAPIFY_API_KEY_Places } from "@/constants/VariableConfigApi";
 export interface FetchGasStationsContextType {
   gasStations: any[];
   fetchNearbyGasStations: (lat: number, lng: number) => Promise<void>;
+  errorMsgGasStations: string | undefined;
+  clearErrorGasStations: () => void;
 }
 export const FetchGasStationsContext =
   createContext<FetchGasStationsContextType | null>(null);
@@ -22,8 +24,9 @@ export const FetchGasStationsProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [gasStations, setGasStations] = useState<Array<any>>([]);
-
-  const GEOAPIFY_API_KEY = "a4e1b1fa978f4758b3b8db8005e8a96f";
+  const [errorMsgGasStations, setErrorMsg] = useState<string | undefined>(
+    undefined
+  );
 
   const { latitude, longitude } = useContext(
     UserLocationContext
@@ -55,12 +58,17 @@ export const FetchGasStationsProvider: React.FC<{ children: ReactNode }> = ({
       setGasStations(results);
       console.log(results);
     } catch (error) {
-      console.error("Error fetching gas stations:", error);
-      // setErrorMsg("Error fetching gas stations");
+      // console.error("Error fetching gas stations:", error);
+      setErrorMsg("Error fetching gas stations");
     }
+  };
+  const clearErrorGasStations = () => {
+    setErrorMsg(undefined);
   };
 
   const value: FetchGasStationsContextType = {
+    errorMsgGasStations,
+    clearErrorGasStations,
     gasStations,
     fetchNearbyGasStations,
   };
