@@ -2,29 +2,21 @@ import {
   Dimensions,
   Image,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import React from "react";
 import { Colors } from "@/constants/Colors";
-import { useAuth } from "@/context/useAuth";
 import { useRouter } from "expo-router";
 import Onboarding from "react-native-onboarding-swiper";
-import { Feather, Ionicons } from "@expo/vector-icons";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 export default function OnBoardingScreen() {
   const router = useRouter();
-  const { currentUser } = useAuth();
   const handleDone = () => {
-    if (currentUser) {
-      router.navigate("/(tabs)/Home");
-    } else {
-      router.navigate("/(tabs)/Home");
-    }
+    router.navigate("/(tabs)/Home");
   };
   const DoneBtn = ({ ...props }) => {
     return (

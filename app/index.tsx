@@ -1,30 +1,23 @@
-import { Link, useRouter } from "expo-router";
-import { StyleSheet, ActivityIndicator, Image, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Colors } from "@/constants/Colors";
-import React, { useEffect } from "react";
-import { useAuth } from "@/context/useAuth";
+import React, { useContext } from "react";
 import "react-native-get-random-values";
 import OnBoardingScreen from "@/components/OnBoardScreen/OnBoardingScreen";
+import { useAuth } from "@/context/useAuth";
+import Home from "./(tabs)/Home";
 
 export default function Page() {
-  // const router = useRouter();
-  // const { currentUser } = useAuth();
+  const { currentUser } = useAuth();
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     if (currentUser) {
-  //       router.navigate("/(tabs)/Home");
-  //     } else {
-  //       router.navigate("/");
-  //     }
-  //   }, 2000); // Show this screen for 2 seconds
-  // }, []);
+  if (!currentUser) {
+    return (
+      <View style={styles.container}>
+        <OnBoardingScreen />
+      </View>
+    );
+  }
 
-  return (
-    <View style={styles.container}>
-      <OnBoardingScreen />
-    </View>
-  );
+  return <Home />;
 }
 
 const styles = StyleSheet.create({

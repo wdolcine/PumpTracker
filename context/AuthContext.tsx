@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const { latitude, longitude } = useContext(UserLocationContext) ?? {};
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     androidClientId:
-      "729641409796-1ooegnogn8lu5tinnfre6mgchlj6gnui.apps.googleusercontent.com",
+      "729641409796-1q9i165bdi1ek4aigbd73a99a618i5r4.apps.googleusercontent.com",
   });
 
   const getLocalUser = async () => {
@@ -82,7 +82,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setCurrentUser(appUser);
         await AsyncStorage.setItem("@user", JSON.stringify(appUser));
         router.replace("/(tabs)/Home");
-        console.log("User authenticated");
+        console.log("User authenticated", JSON.stringify(user, null, 2));
       } else {
         setCurrentUser(null);
         router.replace("/(auth)/LoginScreen");
@@ -100,6 +100,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (response?.type === "success") {
         try {
           const { id_token } = response.params;
+          console.log(id_token);
           const credential = GoogleAuthProvider.credential(id_token);
           const userCredential = await signInWithCredential(
             Firebase_auth,

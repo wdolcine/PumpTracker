@@ -18,20 +18,28 @@ export default function Profile() {
   const { logout, currentUser } = useAuth();
   const [userData, setUserData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    if (currentUser) {
-      getUser(currentUser).then((userData) => {
-        setUserData(userData ?? null);
-        setLoading(false);
-      });
+    try {
+      if (currentUser) {
+        getUser(currentUser).then((userData) => {
+          setUserData(userData ?? null);
+          setLoading(false);
+        });
+      }
+      if (
+        currentUser?.profileImage === null ||
+        userData?.profileImage === null
+      ) {
+        console.log("no image found");
+      } else {
+        console.log("Image:", currentUser?.profileImage);
+      }
+      setLoading(false);
+    } catch (error) {
+      setErrorMsg(`Failed to get ${userData} informations : ${error}`);
     }
-    if (currentUser?.profileImage === null || userData?.profileImage === null) {
-      console.log("no image found");
-    } else {
-      console.log("Image:", currentUser?.profileImage);
-    }
-    setLoading(false);
   }, [currentUser]);
 
   const handleLogOut = async () => {
@@ -69,10 +77,11 @@ export default function Profile() {
                 }}
                 style={styles.profileImage}
               />
-
+              <Text style={styles.errorStyle}>{errorMsg}</Text>
               <View style={styles.profileDetails}>
                 <Text style={styles.name}>
-                  {userData?.lastName || currentUser?.lastName}{" "}
+                  {userData?.lastName || currentUser?.lastName}
+                  {""}
                   {userData?.firstName || currentUser?.firstName}
                 </Text>
                 <Text style={styles.email}>
@@ -103,7 +112,11 @@ export default function Profile() {
               color={Colors.lightColor.iconDefault}
             />
             <Text style={styles.quickLinkLabel}>Privacy Policy</Text>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/privacy");
+              }}
+            >
               <Ionicons
                 name="chevron-forward"
                 size={20}
@@ -118,7 +131,11 @@ export default function Profile() {
               color={Colors.lightColor.iconDefault}
             />
             <Text style={styles.quickLinkLabel}>About PumpTracker</Text>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/infos");
+              }}
+            >
               <Ionicons
                 name="chevron-forward"
                 size={20}
@@ -169,6 +186,10 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: 10,
     marginBottom: 20,
+  },
+  errorStyle: {
+    fontFamily: "Outfit-Regular",
+    color: "red",
   },
   profileImage: {
     width: 80,

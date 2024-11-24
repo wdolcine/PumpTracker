@@ -66,18 +66,33 @@ export default function MyMapView() {
 
   useEffect(() => {
     if (errorMsgLocation || errorMsgGasStations) {
-      Alert.alert(
-        "Location error",
-        errorMsgLocation ? errorMsgLocation : errorMsgGasStations
-      );
-      console.log(errorMsgLocation ? errorMsgLocation : errorMsgGasStations);
+      const errorMessage =
+        errorMsgLocation || errorMsgGasStations || "Unknown location error.";
+      Alert.alert("Location error", errorMessage);
+      console.log(errorMessage);
     }
     return () => {
       {
-        errorMsgLocation ? clearErrorLocation() : clearErrorGasStations;
+        errorMsgLocation ? clearErrorLocation() : clearErrorGasStations();
       }
     };
   }, [errorMsgLocation, errorMsgGasStations]);
+
+  useEffect(() => {
+    if (latitude && longitude && currentUser) {
+      fetchNearbyGasStations(latitude, longitude);
+      mapRef.current?.animateCamera(
+        {
+          center: {
+            latitude,
+            longitude,
+          },
+          zoom: 14,
+        },
+        { duration: 100 }
+      );
+    }
+  }, [latitude, longitude, currentUser]);
 
   const handleLocationSelected = async (location: Location) => {
     if (!currentUser) {
@@ -136,7 +151,7 @@ export default function MyMapView() {
       }
     : undefined;
 
-  if (!locationAvailable) {
+  if (!latitude || !longitude) {
     return (
       <View style={styles.View}>
         <ActivityIndicator size="large" color={Colors.lightColor.tintColor} />
@@ -153,16 +168,34 @@ export default function MyMapView() {
         <CustomSearchBar
           onLocationSelected={handleLocationSelected}
           disabled={!currentUser}
-          onClear={resetToUserLocation}
+          onClear={() =>
+            mapRef.current?.animateCamera(
+              {
+                center: {
+                  latitude,
+                  longitude,
+                },
+                zoom: 14,
+              },
+              { duration: 1000 }
+            )
+          }
         />
       </View>
-      {latitude && longitude && (
+      {currentUser && latitude && longitude && (
         <MapView
           ref={mapRef}
           style={styles.map}
           provider={PROVIDER_GOOGLE}
-          // customMapStyle={MapViewStyle}
-          region={region}
+          customMapStyle={MapViewStyle}
+          initialRegion={{
+            latitude,
+            longitude,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
+          }}
+          // region={region}
+          showsMyLocationButton
         >
           <Marker
             coordinate={{

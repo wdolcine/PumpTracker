@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   FlatList,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import GasStationCard from "./GasStationCard";
 import { useRouter } from "expo-router";
@@ -35,6 +36,18 @@ const GasStationCards: React.FC = () => {
     setSelectedStation(null);
     setModalVisible(false);
   };
+  useEffect(() => {
+    if (errorMsgGasStations) {
+      const errorMessage = errorMsgGasStations || "Unknown location error.";
+      Alert.alert("Location error", errorMessage);
+      console.log(errorMessage);
+    }
+    return () => {
+      {
+        clearErrorGasStations();
+      }
+    };
+  }, [errorMsgGasStations]);
 
   const renderGasStationCard = ({
     item,
@@ -70,17 +83,16 @@ const GasStationCards: React.FC = () => {
       </View>
     );
   }
-  if (currentUser && errorMsgGasStations) {
-    <View style={styles.viewNoUser}>
-      <Text style={[styles.textNoUser, { color: "red" }]}>
-        {errorMsgGasStations}
-      </Text>
-      <Text style={styles.textNoUser}>
-        If the error persists Please Check your internet connection and try
-        again
-      </Text>
-    </View>;
-  }
+  if (errorMsgGasStations && currentUser)
+    return (
+      <View style={styles.viewNoUser}>
+        <Text style={styles.textNoUser}>{errorMsgGasStations}</Text>
+        <Text style={styles.textNoUser}>
+          If the error persists Please Check your internet connection and try
+          again
+        </Text>
+      </View>
+    );
 
   return (
     <View style={styles.container}>
@@ -115,6 +127,7 @@ const styles = StyleSheet.create({
   textNoUser: {
     fontSize: 16,
     fontFamily: "Outfit-Regular",
+    color: "red",
   },
   LoginText: {
     color: Colors.lightColor.textButton,

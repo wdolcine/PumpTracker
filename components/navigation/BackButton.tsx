@@ -13,8 +13,8 @@ export default function BackButton() {
         onPress={() => router.back()}
       >
         <Ionicons
-          name="arrow-back"
-          size={24}
+          name="arrow-back-circle"
+          size={40}
           color={Colors.lightColor.tintColor}
         />
       </TouchableOpacity>
@@ -24,10 +24,8 @@ export default function BackButton() {
 
 const styles = StyleSheet.create({
   touchableOpacity: {
-    paddingTop: 60,
-    paddingLeft: 10,
-    backgroundColor: Colors.lightColor.background,
-    borderRadius: 5,
-    width: 80,
+    marginBottom: -40,
+    marginTop: 25,
+    marginRight: "85%",
   },
 });

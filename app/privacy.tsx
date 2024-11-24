@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
+import PrivacyPolicy from "@/components/PrivacyPolicy";
 
-export default function About_PumpTracker() {
+export default function privacy() {
   return (
     <View>
-      <Text>About_PumpTracker</Text>
+      <PrivacyPolicy />
     </View>
   );
 }
