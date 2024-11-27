@@ -5,8 +5,15 @@ import {
   Text,
   View,
   Alert,
+  Animated,
+  FlatList,
 } from "react-native";
-import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
+import MapView, {
+  Marker,
+  Polyline,
+  PROVIDER_GOOGLE,
+  Region,
+} from "react-native-maps";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import MapViewStyle from "@/constants/MapViewStyle.json";
 import { Colors } from "@/constants/Colors";
@@ -23,6 +30,8 @@ import {
 import GasStationDetailsModal from "../GasStation/GasStationDetailsModal";
 import { useAuth } from "@/context/useAuth";
 import { useRouter } from "expo-router";
+import getRoute from "@/services/getRoute";
+import { TouchableOpacity } from "react-native";
 
 export default function MyMapView() {
   interface Location {
@@ -41,18 +50,49 @@ export default function MyMapView() {
     clearErrorGasStations,
   } = useContext(FetchGasStationsContext) as FetchGasStationsContextType;
 
-  const { latitude, longitude, clearErrorLocation, errorMsgLocation } =
-    userLocationContext || {};
+  const {
+    latitude,
+    longitude,
+    location,
+    clearErrorLocation,
+    errorMsgLocation,
+  } = userLocationContext || {};
 
-  const locationAvailable = latitude !== undefined && longitude !== undefined;
+  // const locationAvailable = latitude !== undefined && longitude !== undefined;
 
   const { currentUser } = useAuth();
+
   const router = useRouter();
 
   const mapRef = useRef<MapView>(null);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedStation, setSelectedStation] = useState<any | null>(null);
+  const [route, setRoute] = useState<any | null>(null);
+  const [selectedMode, setSelectedMode] = useState<string>("walk");
+
+  const modes = [
+    { key: "drive", label: "Drive" },
+    { key: "walk", label: "Walk" },
+    { key: "bicycle", label: "Bicycle" },
+    { key: "motorcycle", label: "Motorcycle" },
+  ];
+
+  const handleModeChange = async (mode: string) => {
+    setSelectedMode(mode);
+    console.log(selectedMode);
+    if (latitude && longitude && selectedMode) {
+      const routeData = await getRoute(
+        { latitude, longitude },
+        { latitude: selectedStation.lat, longitude: selectedStation.lon },
+        mode
+      );
+      if (routeData) {
+        setRoute(routeData);
+        console.log(selectedMode);
+      }
+    }
+  };
 
   const openModal = (placeId: string) => {
     setSelectedStation(placeId);
@@ -114,21 +154,68 @@ export default function MyMapView() {
     console.log("Selected Location:", location);
   };
 
-  const handleMarkerPress = (lat: number, lon: number) => {
-    mapRef.current?.animateCamera(
-      {
-        center: {
-          latitude: lat,
-          longitude: lon,
-        },
-        zoom: 16,
-      },
-      { duration: 1000 }
+  const handleMarkerPress = async (lat: number, lon: number) => {
+    if (!location) {
+      console.error("User location not available");
+      return;
+    }
+    const { latitude, longitude } = location.coords;
+
+    const routeData = await getRoute(
+      { latitude, longitude },
+      { latitude: lat, longitude: lon },
+      selectedMode
+    );
+    if (routeData) {
+      setRoute(routeData);
+      console.log(selectedMode);
+      console.log(
+        "Processed Polyline Coordinates:",
+        route?.route?.geometry?.coordinates?.map(
+          ([lng, lat]: [number, number]) => ({
+            latitude: lat,
+            longitude: lng,
+          })
+        )
+      );
+
+      console.log("Route found!!!!!");
+    } else {
+      console.error(" No route found!!!!!");
+    }
+
+    // mapRef.current?.animateCamera(
+    //   {
+    //     center: {
+    //       latitude: lat,
+    //       longitude: lon,
+    //     },
+    //     zoom: 16,
+    //   },
+    //   { duration: 1000 }
+    // );
+  };
+
+  const renderModeItem = ({
+    item,
+  }: {
+    item: { key: string; label: string };
+  }) => {
+    return (
+      <TouchableOpacity
+        style={[
+          styles.modeItem,
+          selectedMode === item.key && styles.selectedMode,
+        ]}
+        onPress={() => handleModeChange(item.key)}
+      >
+        <Text style={styles.modeLabel}>{item.label}</Text>
+      </TouchableOpacity>
     );
   };
 
   const resetToUserLocation = () => {
-    if (locationAvailable) {
+    if (!longitude && !latitude) {
       mapRef.current?.animateCamera(
         {
           center: {
@@ -142,16 +229,17 @@ export default function MyMapView() {
     }
   };
 
-  const region: Region | undefined = locationAvailable
-    ? {
-        latitude: latitude,
-        longitude: longitude,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      }
-    : undefined;
+  const region: Region | undefined =
+    longitude && latitude
+      ? {
+          latitude: latitude,
+          longitude: longitude,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        }
+      : undefined;
 
-  if (!latitude || !longitude) {
+  if (!longitude && !latitude && !currentUser) {
     return (
       <View style={styles.View}>
         <ActivityIndicator size="large" color={Colors.lightColor.tintColor} />
@@ -182,19 +270,19 @@ export default function MyMapView() {
           }
         />
       </View>
-      {currentUser && latitude && longitude && (
+      {longitude && latitude && (
         <MapView
           ref={mapRef}
           style={styles.map}
           provider={PROVIDER_GOOGLE}
           customMapStyle={MapViewStyle}
-          initialRegion={{
-            latitude,
-            longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          }}
-          // region={region}
+          // initialRegion={{
+          //   latitude,
+          //   longitude,
+          //   latitudeDelta: 0.05,
+          //   longitudeDelta: 0.05,
+          // }}
+          region={region}
           showsMyLocationButton
         >
           <Marker
@@ -205,7 +293,7 @@ export default function MyMapView() {
             title="Your Location"
             description="Where you are"
             onPress={() => {
-              handleMarkerPress(latitude, longitude);
+              resetToUserLocation();
             }}
           >
             <Image
@@ -228,14 +316,45 @@ export default function MyMapView() {
                 }}
               />
             ))}
+          {/* {route && route?.route?.geometry?.coordinates?.length > 0 && (
+            <Polyline
+              coordinates={route?.route?.geometry?.coordinates?.map(
+                ([lng, lat]: [number, number]) => ({
+                  latitude: lat,
+                  longitude: lng,
+                })
+              )}
+              strokeColor="blue"
+              strokeWidth={3}
+            />
+          )} */}
         </MapView>
       )}
+      {/* {selectedStation && (
+        <FlatList
+          data={modes}
+          keyExtractor={(item) => item.key}
+          horizontal
+          style={styles.modesContainer}
+          renderItem={renderModeItem}
+        />
+      )} */}
 
-      <GasStationDetailsModal
+      {selectedStation && route && (
+        <View style={styles.infoBox}>
+          <Text style={styles.message}>
+            Distance: {route.distance.toFixed(2)} km
+          </Text>
+          <Text style={styles.message}>
+            Durée: {route.duration.toFixed(0)} minutes
+          </Text>
+        </View>
+      )}
+      {/* <GasStationDetailsModal
         isVisible={modalVisible}
         onClose={closeModal}
         placeId={selectedStation}
-      />
+      /> */}
     </View>
   );
 }
@@ -262,6 +381,47 @@ const styles = StyleSheet.create({
   message: {
     fontSize: 16,
     color: Colors.lightColor.iconDefault,
-    textAlign: "center",
+    fontFamily: "Outfit-SemiBold",
+  },
+  modesContainer: {
+    position: "absolute",
+    bottom: 100,
+    left: 10,
+    right: 10,
+    backgroundColor: "white",
+    paddingVertical: 10,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  modeItem: {
+    padding: 10,
+    marginHorizontal: 5,
+    backgroundColor: Colors.lightColor.background,
+    borderRadius: 5,
+  },
+  selectedMode: {
+    backgroundColor: Colors.lightColor.tintColor,
+  },
+  modeLabel: {
+    fontSize: 14,
+    color: Colors.lightColor.text,
+  },
+  infoBox: {
+    position: "absolute",
+    bottom: 10,
+    left: 10,
+    right: 10,
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  infoText: {
+    fontSize: 16,
+    color: Colors.lightColor.text,
   },
 });

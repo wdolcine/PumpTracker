@@ -130,9 +130,14 @@ export default function LoginScreen() {
         <View style={styles.Footer}>
           <Text style={styles.footerText}>
             By logging, you are agreeing with our <Text>{"\n"}</Text>
-            <Text style={styles.link}>Terms of Use </Text> and
+            <Link href="/privacy" style={styles.link}>
+              Terms of Use{" "}
+            </Link>{" "}
+            and
             {"  "}
-            <Text style={styles.link}>Privacy Policy</Text>
+            <Link href="/privacy" style={styles.link}>
+              Privacy Policy
+            </Link>
           </Text>
 
           <TouchableOpacity>

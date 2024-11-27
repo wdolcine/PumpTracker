@@ -17,6 +17,7 @@ const Markers: React.FC<MarkersProps> = ({
   address,
   onPress,
 }) => {
+  if (!latitude || !longitude) return null;
   const openIcon = require("@/assets/images/GasStationMarkerOpen.png");
   const closedIcon = require("@/assets/images/GasStationMarkerOpen.png");
   return (

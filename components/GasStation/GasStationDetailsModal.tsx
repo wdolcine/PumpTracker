@@ -17,8 +17,6 @@ interface GasStationDetailsModalProps {
   placeId: string | null;
 }
 
-const GEOAPIFY_API_KEY = "57e75487a30840208d19ba28227d9fd1";
-
 const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
   isVisible,
   onClose,
@@ -57,7 +55,7 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
           ],
           fuel_options: feature.fuel_options || {},
         });
-        console.log("API Response:", data.features[0].properties);
+        // console.log("API Response:", data.features[0].properties);
       } else {
         // console.error("No details found for the selected gas station.");
         seterrorMsgGsDetails("No details found for the selected gas station.");

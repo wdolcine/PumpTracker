@@ -180,14 +180,21 @@ const RegisterScreen = () => {
             onValueChange={(newValue: boolean) => setAgreeTerms(newValue)}
           />
           <Text style={styles.checkboxText}>
-            By registering, you are agreeing with our{" \n"}
-            <Text style={styles.link}>Terms of Use</Text> and{" "}
-            <Text style={styles.link}>Privacy Policy</Text>
+            By registering, you are agreeing with our{"\n"}
+            <Link href="/privacy" style={styles.link}>
+              {"\t"}
+              {"\t"}Terms of Use
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" style={styles.link}>
+              Privacy Policy
+            </Link>
           </Text>
         </View>
         <TouchableOpacity>
           <Text style={styles.footerText}>
-            Already have an account?{" "}
+            {"\t"}
+            {"\t"}Already have an account?{" "}
             <Link href="../(auth)/LoginScreen" style={styles.link}>
               Log in
             </Link>

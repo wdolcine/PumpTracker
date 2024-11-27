@@ -5,18 +5,24 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { Colors } from "@/constants/Colors";
 import { useRouter } from "expo-router";
 import Onboarding from "react-native-onboarding-swiper";
 import { Ionicons } from "@expo/vector-icons";
+import { UserLocationContext } from "@/context/UserLocationContext";
 
 const { width } = Dimensions.get("window");
 
 export default function OnBoardingScreen() {
   const router = useRouter();
+  const userLocationContext = useContext(UserLocationContext);
+
   const handleDone = () => {
-    router.navigate("/(tabs)/Home");
+    if (userLocationContext) {
+      userLocationContext.requestUserLocation();
+      router.navigate("/(tabs)/Home");
+    }
   };
   const DoneBtn = ({ ...props }) => {
     return (

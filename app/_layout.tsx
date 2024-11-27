@@ -13,7 +13,7 @@ import { FetchGasStationsProvider } from "@/services/fetchGasStations";
 import ProtectedRoute from "@/components/navigation/ProtectedRoute";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-// SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [fontsLoaded, setFontsLoaded] = useState(false);

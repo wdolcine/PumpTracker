@@ -13,6 +13,8 @@ import { useAuth } from "@/context/useAuth";
 import { getUser } from "@/utils/getUser";
 import { User } from "@/utils";
 import { router } from "expo-router";
+import { useUserLocation } from "@/context/useUserLocation";
+import { useFetchGasStations } from "@/services/useFetchGasStations";
 
 export default function Profile() {
   const { logout, currentUser } = useAuth();
@@ -80,8 +82,7 @@ export default function Profile() {
               <Text style={styles.errorStyle}>{errorMsg}</Text>
               <View style={styles.profileDetails}>
                 <Text style={styles.name}>
-                  {userData?.lastName || currentUser?.lastName}
-                  {""}
+                  {userData?.lastName || currentUser?.lastName}{" "}
                   {userData?.firstName || currentUser?.firstName}
                 </Text>
                 <Text style={styles.email}>
@@ -92,13 +93,6 @@ export default function Profile() {
           ) : (
             <Text>No user logged in</Text>
           )}
-          {/* <TouchableOpacity style={styles.editIcon}>
-            <Ionicons
-              name="create-outline"
-              size={20}
-              color={Colors.lightColor.iconSelected}
-            />
-          </TouchableOpacity> */}
         </View>
 
         {/* Quick Link */}

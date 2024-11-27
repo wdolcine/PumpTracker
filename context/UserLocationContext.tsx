@@ -1,4 +1,10 @@
-import React, { createContext, useState, ReactNode, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  ReactNode,
+  useEffect,
+  useCallback,
+} from "react";
 import * as Location from "expo-location";
 
 export interface LocationContextType {
@@ -10,6 +16,7 @@ export interface LocationContextType {
   longitude: number;
   errorMsgLocation: string | undefined;
   clearErrorLocation: () => void;
+  requestUserLocation: () => Promise<void>;
 }
 
 export const UserLocationContext = createContext<LocationContextType | null>(
@@ -26,25 +33,41 @@ export const UserLocationProvider: React.FC<{ children: ReactNode }> = ({
     undefined
   );
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+  const requestUserLocation = useCallback(async () => {
+    try {
+      let { status } = await Location.requestBackgroundPermissionsAsync();
       if (status !== "granted") {
         setErrorMsg("Permission to access location was denied");
-        // console.error(errorMsg);
         return;
       }
-      try {
-        let location = await Location.getCurrentPositionAsync({});
-        // const coords = location.coords;
-        setLocation(location);
-        console.log(location.coords);
-      } catch (error) {
-        // console.error("Error getting location:", error);
-        setErrorMsg("Error retrieving location.");
-      }
-    })();
+      const userLocation = await Location.getCurrentPositionAsync({});
+      setLocation(userLocation);
+      console.log("User location updated:", userLocation.coords);
+    } catch (error) {
+      setErrorMsg(`Error retrieving location : ${error}`);
+    }
   }, []);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     let { status } = await Location.requestForegroundPermissionsAsync();
+  //     if (status !== "granted") {
+  //       setErrorMsg("Permission to access location was denied");
+  //       return;
+  //     }
+  //     try {
+  //       let location = await Location.getCurrentPositionAsync({});
+  //       setLocation(location);
+  //       console.log(location.coords);
+  //     } catch (error) {
+  //       setErrorMsg(`Error retrieving location: ${error}`);
+  //     }
+  //   })();
+  // }, []);
+
+  useEffect(() => {
+    requestUserLocation();
+  }, [requestUserLocation]);
 
   const latitude = location?.coords.latitude ?? 0;
   const longitude = location?.coords.longitude ?? 0;
@@ -53,18 +76,13 @@ export const UserLocationProvider: React.FC<{ children: ReactNode }> = ({
     setErrorMsg(undefined);
   };
 
-  let text = "Waiting..";
-  if (errorMsgLocation) {
-    text = errorMsgLocation;
-  } else if (location) {
-    text = JSON.stringify(location);
-  }
   const value: LocationContextType = {
     location,
     errorMsgLocation,
     clearErrorLocation,
     setLocation,
     latitude,
+    requestUserLocation,
     longitude,
   };
   return (

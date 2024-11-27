@@ -25,4 +25,3 @@ const Firebase_rtdb = getDatabase(Firebase_app);
 
 export {Firebase_app, Firebase_auth , googleProvider , Firebase_db,Firebase_rtdb};
 
-// Android_ClientID : 729641409796-1q9i165bdi1ek4aigbd73a99a618i5r4.apps.googleusercontent.com

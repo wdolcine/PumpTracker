@@ -1,6 +1,5 @@
 import {Firebase_db} from "@/config/firebaseConfig"
 import { setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
-// import database from "@react-native-firebase/database";
 import { User,ExtraData } from "./";
 import { Firebase_rtdb } from "@/config/firebaseConfig";
 import { ref, set } from "firebase/database";
