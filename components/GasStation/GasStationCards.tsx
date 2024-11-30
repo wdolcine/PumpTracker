@@ -26,13 +26,19 @@ const GasStationCards: React.FC = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedStation, setSelectedStation] = useState<any | null>(null);
+  const [selectedCoords, setSelectedCoords] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
 
-  const openModal = (placeId: string) => {
+  const openModal = (placeId: string, lat: number, lon: number) => {
+    setSelectedCoords({ lat, lon });
     setSelectedStation(placeId);
     setModalVisible(true);
   };
 
   const closeModal = () => {
+    setSelectedCoords(null);
     setSelectedStation(null);
     setModalVisible(false);
   };
@@ -56,12 +62,14 @@ const GasStationCards: React.FC = () => {
       place_id: string;
       name: string;
       address: string;
+      lat: number;
+      lon: number;
     };
   }) => (
     <GasStationCard
       title={item.name}
       address={item.address}
-      onPress={() => openModal(item.place_id)}
+      onPress={() => openModal(item.place_id, item.lat, item.lon)}
     />
   );
 
@@ -105,6 +113,7 @@ const GasStationCards: React.FC = () => {
         isVisible={modalVisible}
         onClose={closeModal}
         placeId={selectedStation}
+        gasStationCoords={selectedCoords}
       />
     </View>
   );

@@ -1,40 +1,61 @@
 import { Colors } from "@/constants/Colors";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Modal,
+  FlatList,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import getRoute from "@/services/getRoute";
+import {
+  UserLocationContext,
+  LocationContextType,
+} from "@/context/UserLocationContext";
 import { GEOAPIFY_API_KEY_Places_Details } from "@/constants/VariableConfigApi";
 
 interface GasStationDetailsModalProps {
   isVisible: boolean;
   onClose: () => void;
   placeId: string | null;
+  gasStationCoords: { lat: number; lon: number } | null;
 }
+const modes = ["drive", "walk", "motorcycle", "bicycle"];
 
 const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
   isVisible,
   onClose,
   placeId,
+  gasStationCoords,
 }) => {
   const [details, setDetails] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
+  const [distance, setDistance] = useState<number | null>(null);
+  const [duration, setDuration] = useState<number | null>(null);
+
+  const [selectedMode, setSelectedMode] = useState<string>("drive");
   const [errorMsgGsDetails, seterrorMsgGsDetails] = useState<
     string | undefined
   >(undefined);
 
-  useEffect(() => {
-    if (placeId) {
-      fetchPlaceDetails(placeId);
-    }
-  }, [placeId]);
+  const userLocationContext = useContext(
+    UserLocationContext
+  ) as LocationContextType;
+  const { latitude, longitude } = userLocationContext;
 
-  const fetchPlaceDetails = async (placeId: string) => {
+  useEffect(() => {
+    if (placeId && gasStationCoords) {
+      fetchPlaceDetails(placeId, gasStationCoords);
+    }
+  }, [placeId, gasStationCoords, selectedMode]);
+
+  const fetchPlaceDetails = async (
+    placeId: string,
+    gasStationCoords: { lat: number; lon: number }
+  ) => {
     setLoading(true);
     const url = `https://api.geoapify.com/v2/place-details?id=${placeId}&apiKey=${GEOAPIFY_API_KEY_Places_Details}`;
 
@@ -55,7 +76,18 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
           ],
           fuel_options: feature.fuel_options || {},
         });
-        // console.log("API Response:", data.features[0].properties);
+
+        if (latitude && longitude) {
+          const routeData = await getRoute(
+            { latitude, longitude },
+            { latitude: gasStationCoords.lat, longitude: gasStationCoords.lon },
+            selectedMode
+          );
+          if (routeData) {
+            setDistance(routeData.distance);
+            setDuration(routeData.duration);
+          }
+        }
       } else {
         // console.error("No details found for the selected gas station.");
         seterrorMsgGsDetails("No details found for the selected gas station.");
@@ -69,6 +101,25 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
       setLoading(false);
     }
   };
+
+  const renderModeItem = ({ item }: { item: string }) => (
+    <TouchableOpacity
+      style={[
+        styles.modeButton,
+        selectedMode === item && styles.selectedModeButton,
+      ]}
+      onPress={() => setSelectedMode(item)}
+    >
+      <Text
+        style={[
+          styles.modeText,
+          selectedMode === item && styles.selectedModeText,
+        ]}
+      >
+        {item.charAt(0).toUpperCase() + item.slice(1)}
+      </Text>
+    </TouchableOpacity>
+  );
 
   if (!placeId || errorMsgGsDetails) {
     return (
@@ -113,7 +164,7 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
               color={Colors.lightColor.tintColor}
             />
           ) : details ? (
-            <ScrollView>
+            <ScrollView style={styles.scrollView}>
               <Text style={styles.stationName}>{details.name}</Text>
               <Text style={styles.detailText}>
                 {" "}
@@ -128,12 +179,12 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
                 </Text>
               )}
               <Text style={styles.detailText}>
-                <Text style={styles.title}> Open Now : </Text>
+                <Text style={styles.title}>Open Now : </Text>
                 {details.open_now ? "Yes" : "No"}
               </Text>
               {details.opening_hours > 0 && (
                 <View>
-                  <Text style={styles.detailText}>Opening Hours:</Text>
+                  <Text style={styles.detailText}> Opening Hours: </Text>
                   {details.opening_hours.map((hour: string, index: number) => (
                     <Text key={index} style={styles.openingHourText}>
                       {hour}
@@ -162,6 +213,22 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
                   No fuel options available
                 </Text>
               )}
+              <FlatList
+                data={modes}
+                renderItem={renderModeItem}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item) => item}
+                style={styles.modeSelector}
+              />
+              <Text style={styles.detailText}>
+                <Text style={styles.title}>Distance:</Text>{" "}
+                {distance ? `${distance.toFixed(2)} km` : "Calculating..."}
+              </Text>
+              <Text style={styles.detailText}>
+                <Text style={styles.title}>Duration:</Text>{" "}
+                {duration ? `${duration.toFixed(0)} minutes` : "Calculating..."}
+              </Text>
             </ScrollView>
           ) : (
             <Text style={styles.errorText}>No details available</Text>
@@ -188,6 +255,9 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
   },
+  scrollView: {
+    padding: 5,
+  },
   stationName: {
     fontSize: 20,
     fontFamily: "Outfit-Bold",
@@ -195,8 +265,28 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: "Outfit-SemiBold",
+    fontSize: 16,
+    paddingTop: 10,
   },
-
+  modeSelector: {
+    marginVertical: 10,
+  },
+  modeButton: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: Colors.lightColor.text,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  selectedModeButton: {
+    backgroundColor: Colors.lightColor.tintColor,
+  },
+  modeText: {
+    color: Colors.lightColor.text,
+  },
+  selectedModeText: {
+    color: "#fff",
+  },
   fuelOption: {
     fontSize: 15,
     // color: "#555",

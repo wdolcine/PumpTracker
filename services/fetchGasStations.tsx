@@ -59,6 +59,7 @@ export const FetchGasStationsProvider: React.FC<{ children: ReactNode }> = ({
       console.log(results);
     } catch (error) {
       // console.error("Error fetching gas stations:", error);
+
       setErrorMsg("Error fetching gas stations");
     }
   };

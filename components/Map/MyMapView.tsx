@@ -30,8 +30,6 @@ import {
 import GasStationDetailsModal from "../GasStation/GasStationDetailsModal";
 import { useAuth } from "@/context/useAuth";
 import { useRouter } from "expo-router";
-import getRoute from "@/services/getRoute";
-import { TouchableOpacity } from "react-native";
 
 export default function MyMapView() {
   interface Location {
@@ -68,38 +66,19 @@ export default function MyMapView() {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedStation, setSelectedStation] = useState<any | null>(null);
-  const [route, setRoute] = useState<any | null>(null);
-  const [selectedMode, setSelectedMode] = useState<string>("walk");
+  const [selectedCoords, setSelectedCoords] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
 
-  const modes = [
-    { key: "drive", label: "Drive" },
-    { key: "walk", label: "Walk" },
-    { key: "bicycle", label: "Bicycle" },
-    { key: "motorcycle", label: "Motorcycle" },
-  ];
-
-  const handleModeChange = async (mode: string) => {
-    setSelectedMode(mode);
-    console.log(selectedMode);
-    if (latitude && longitude && selectedMode) {
-      const routeData = await getRoute(
-        { latitude, longitude },
-        { latitude: selectedStation.lat, longitude: selectedStation.lon },
-        mode
-      );
-      if (routeData) {
-        setRoute(routeData);
-        console.log(selectedMode);
-      }
-    }
-  };
-
-  const openModal = (placeId: string) => {
+  const openModal = (placeId: string, lat: number, lon: number) => {
+    setSelectedCoords({ lat, lon });
     setSelectedStation(placeId);
     setModalVisible(true);
   };
 
   const closeModal = () => {
+    setSelectedCoords(null);
     setSelectedStation(null);
     setModalVisible(false);
   };
@@ -152,66 +131,6 @@ export default function MyMapView() {
     );
     await fetchNearbyGasStations(location.lat, location.lon);
     console.log("Selected Location:", location);
-  };
-
-  const handleMarkerPress = async (lat: number, lon: number) => {
-    if (!location) {
-      console.error("User location not available");
-      return;
-    }
-    const { latitude, longitude } = location.coords;
-
-    const routeData = await getRoute(
-      { latitude, longitude },
-      { latitude: lat, longitude: lon },
-      selectedMode
-    );
-    if (routeData) {
-      setRoute(routeData);
-      console.log(selectedMode);
-      console.log(
-        "Processed Polyline Coordinates:",
-        route?.route?.geometry?.coordinates?.map(
-          ([lng, lat]: [number, number]) => ({
-            latitude: lat,
-            longitude: lng,
-          })
-        )
-      );
-
-      console.log("Route found!!!!!");
-    } else {
-      console.error(" No route found!!!!!");
-    }
-
-    // mapRef.current?.animateCamera(
-    //   {
-    //     center: {
-    //       latitude: lat,
-    //       longitude: lon,
-    //     },
-    //     zoom: 16,
-    //   },
-    //   { duration: 1000 }
-    // );
-  };
-
-  const renderModeItem = ({
-    item,
-  }: {
-    item: { key: string; label: string };
-  }) => {
-    return (
-      <TouchableOpacity
-        style={[
-          styles.modeItem,
-          selectedMode === item.key && styles.selectedMode,
-        ]}
-        onPress={() => handleModeChange(item.key)}
-      >
-        <Text style={styles.modeLabel}>{item.label}</Text>
-      </TouchableOpacity>
-    );
   };
 
   const resetToUserLocation = () => {
@@ -311,8 +230,7 @@ export default function MyMapView() {
                 title={station.name}
                 address={station.address}
                 onPress={() => {
-                  openModal(station.place_id);
-                  handleMarkerPress(station.lat, station.lon);
+                  openModal(station.place_id, station.lat, station.lon);
                 }}
               />
             ))}
@@ -322,7 +240,7 @@ export default function MyMapView() {
                 ([lng, lat]: [number, number]) => ({
                   latitude: lat,
                   longitude: lng,
-                })
+                })  
               )}
               strokeColor="blue"
               strokeWidth={3}
@@ -330,31 +248,12 @@ export default function MyMapView() {
           )} */}
         </MapView>
       )}
-      {/* {selectedStation && (
-        <FlatList
-          data={modes}
-          keyExtractor={(item) => item.key}
-          horizontal
-          style={styles.modesContainer}
-          renderItem={renderModeItem}
-        />
-      )} */}
-
-      {selectedStation && route && (
-        <View style={styles.infoBox}>
-          <Text style={styles.message}>
-            Distance: {route.distance.toFixed(2)} km
-          </Text>
-          <Text style={styles.message}>
-            Durée: {route.duration.toFixed(0)} minutes
-          </Text>
-        </View>
-      )}
-      {/* <GasStationDetailsModal
+      <GasStationDetailsModal
         isVisible={modalVisible}
         onClose={closeModal}
         placeId={selectedStation}
-      /> */}
+        gasStationCoords={selectedCoords}
+      />
     </View>
   );
 }

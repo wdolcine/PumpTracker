@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -57,7 +58,9 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
       setSuggestions(results);
     } catch (error) {
       // console.error("Error fetching suggestions:", error);
-      setQuery("Can't find location suggestions");
+      Alert.alert(`Autocomplete Api error ${error}`);
+
+      // setQuery("Can't find location suggestions");
     }
   };
 
