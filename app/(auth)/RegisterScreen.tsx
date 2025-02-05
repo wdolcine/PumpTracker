@@ -163,7 +163,7 @@ const RegisterScreen = () => {
             {loading ? "Registering..." : "Register"}
           </Text>
         </TouchableOpacity>
-        <Text style={styles.orText}>Or connect via</Text>
+        {/* <Text style={styles.orText}>Or connect via</Text>
         <View style={styles.socialContainer}>
           <TouchableOpacity style={styles.socialButton} onPress={handleGoogle}>
             <FontAwesome5
@@ -173,7 +173,7 @@ const RegisterScreen = () => {
               size={24}
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View style={styles.checkboxContainer}>
           <MyCheckbox
             checked={agreeTerms}
@@ -191,15 +191,15 @@ const RegisterScreen = () => {
             </Link>
           </Text>
         </View>
-        <TouchableOpacity>
+        <Text>
           <Text style={styles.footerText}>
             {"\t"}
             {"\t"}Already have an account?{" "}
-            <Link href="../(auth)/LoginScreen" style={styles.link}>
+            <Link href="/(auth)/LoginScreen" style={styles.link}>
               Log in
             </Link>
           </Text>
-        </TouchableOpacity>
+        </Text>
       </View>
     </ScrollView>
   );
@@ -214,8 +214,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     minHeight: "auto",
-    // marginTop: 40,
+    marginTop: 10,
     paddingTop: 60,
+    paddingBottom: 70,
   },
   errorText: { color: "red", marginVertical: 5 },
   title: {
@@ -309,7 +310,6 @@ const styles = StyleSheet.create({
     color: "#666",
     textAlign: "center",
     fontFamily: "Outfit-Regular",
-    marginBottom: 20,
   },
 });
 

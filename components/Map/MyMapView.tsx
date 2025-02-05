@@ -6,7 +6,6 @@ import {
   View,
   Alert,
   Animated,
-  FlatList,
 } from "react-native";
 import MapView, {
   Marker,

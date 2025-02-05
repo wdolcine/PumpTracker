@@ -22,13 +22,14 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import * as WebBrowser from "expo-web-browser";
+import { makeRedirectUri } from "expo-auth-session";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Google from "expo-auth-session/providers/google";
 import { Firebase_auth } from "@/config/firebaseConfig";
 import { User, ExtraData } from "../utils";
 import { addUser } from "../utils/addUser";
-
 import { convertFirebaseUserToUser } from "../utils/convertFirebaseUser";
+import { Alert } from "react-native";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -57,8 +58,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const router = useRouter();
   const { latitude, longitude } = useContext(UserLocationContext) ?? {};
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    iosClientId:
+      "729641409796-mup9hs9bk5kgf4bhnv89da8baimv0tj6.apps.googleusercontent.com",
     androidClientId:
       "729641409796-1q9i165bdi1ek4aigbd73a99a618i5r4.apps.googleusercontent.com",
+    // clientId:
+    //   "19833993261-uja4iq9l5oaankk4kupnitmg1sji6ig7.apps.googleusercontent.com",
   });
 
   const getLocalUser = async () => {
@@ -76,7 +81,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     getLocalUser();
-    const unsubscribe = onAuthStateChanged(Firebase_auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(Firebase_auth, async (user: any) => {
       if (user) {
         const appUser = convertFirebaseUserToUser(user);
         setCurrentUser(appUser);
@@ -166,8 +171,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     password: string,
     extraData?: ExtraData
   ) => {
-    // const { latitude, longitude } = useContext(UserLocationContext) ?? {};
-
     try {
       const userCredential = await createUserWithEmailAndPassword(
         Firebase_auth,
@@ -227,8 +230,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
+        Alert.alert(
+          "Error login with email",
+          " Invalid email or password. Please try again "
+        );
       } else {
         // console.error("An unknown error occured during login");
+        Alert.alert(
+          "Error login with email",
+          " Invalid email or password. Please try again "
+        );
         setError("An unknown error occured during login");
       }
     }
@@ -237,6 +248,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   // Google Login
   const logInWithGoogle = async () => {
     try {
+      console.log("Await Logging with google");
+      const redirectUri = makeRedirectUri();
+      console.log("Redirect URI:", redirectUri);
+
       await promptAsync();
       console.log("Logging with google");
     } catch (error) {
@@ -244,21 +259,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         console.error("Google Login Error:", error.message);
         setError(error.message);
       } else {
-        // console.error("An unknown error occurred during Google login");
         setError("An unknown error occured during Google Login");
       }
     }
   };
+
   const resetPassword = async (email: string) => {
     try {
       await sendPasswordResetEmail(Firebase_auth, email);
       console.log("Password reset email sent");
     } catch (error) {
       if (error instanceof Error) {
-        // console.error("Error resetting password:", error.message);
         setError(error.message);
       } else {
-        // console.error("Unknown error during password reset");
         setError("An unknown error occured during password reset");
       }
     }
@@ -276,7 +289,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         console.error("Logout Error:", error.message);
         setError(error.message);
       } else {
-        // console.error("An unknown error occurred during logout");
         setError("An unknown error occurred during logout");
       }
     }

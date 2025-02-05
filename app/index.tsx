@@ -5,6 +5,9 @@ import "react-native-get-random-values";
 import OnBoardingScreen from "@/components/OnBoardScreen/OnBoardingScreen";
 import { useAuth } from "@/context/useAuth";
 import Home from "./(tabs)/Home";
+import LoginScreen from "./(auth)/LoginScreen";
+import RegisterScreen from "./(auth)/RegisterScreen";
+
 export default function Page() {
   const { currentUser } = useAuth();
 

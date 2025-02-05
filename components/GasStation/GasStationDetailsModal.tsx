@@ -289,7 +289,6 @@ const styles = StyleSheet.create({
   },
   fuelOption: {
     fontSize: 15,
-    // color: "#555",
     marginLeft: 10,
     fontFamily: "Outfit-Regular",
   },

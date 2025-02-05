@@ -40,7 +40,7 @@ export default function OnBoardingScreen() {
       <Onboarding
         onDone={handleDone}
         onSkip={handleDone}
-        containerStyles={{ paddingHorizontal: 50 }}
+        containerStyles={{ paddingHorizontal: 45 }}
         bottomBarHighlight={false}
         DoneButtonComponent={DoneBtn}
         titleStyles={{ fontFamily: "Outfit-SemiBold" }}
@@ -72,7 +72,7 @@ export default function OnBoardingScreen() {
             ),
             title: "Save your Time",
             subtitle:
-              "With real-time information on nearby gas stations, up-to-date fuel prices, you can quickly find the best place to refuel without struggling",
+              "With real-time information on nearby gas stations, you can quickly find the best place to refuel without struggling",
           },
         ]}
       />
@@ -87,13 +87,13 @@ const styles = StyleSheet.create({
   },
   ImgContainer: {
     width: width * 1.1,
-    height: width,
+    height: 350,
   },
   Donebtn: {
     paddingRight: 20,
   },
   ImgContainer1: {
     width: width * 1,
-    height: width,
+    height: 350,
   },
 });

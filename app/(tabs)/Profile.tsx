@@ -49,7 +49,7 @@ export default function Profile() {
       console.log("Logged out");
       await logout();
     } else {
-      router.push("/(auth)/LoginScreen");
+      router.navigate("/(auth)/LoginScreen");
     }
   };
 

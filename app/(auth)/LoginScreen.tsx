@@ -47,13 +47,10 @@ export default function LoginScreen() {
     await logInWithGoogle();
     console.log("Google");
   };
-  const NavigateRegister = () => {
-    console.log("Moving to register screen");
-  };
   const handleLogin = async () => {
-    console.log("Logged in");
     setLoading(true);
     await login(email, password);
+    console.log("Logged in");
 
     setLoading(false);
   };
@@ -115,7 +112,7 @@ export default function LoginScreen() {
           </Text>
         </TouchableOpacity>
 
-        <Text style={styles.orText}>Or connect via</Text>
+        {/* <Text style={styles.orText}>Or connect via</Text>
 
         <View style={styles.socialContainer}>
           <TouchableOpacity style={styles.socialButton} onPress={handleGoogle}>
@@ -126,7 +123,7 @@ export default function LoginScreen() {
               size={24}
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View style={styles.Footer}>
           <Text style={styles.footerText}>
             By logging, you are agreeing with our <Text>{"\n"}</Text>
@@ -140,14 +137,14 @@ export default function LoginScreen() {
             </Link>
           </Text>
 
-          <TouchableOpacity>
-            <Text style={styles.footerText} onPress={NavigateRegister}>
+          <Text>
+            <Text style={styles.footerText}>
               No account yet?{" "}
-              <Link href="../(auth)/RegisterScreen" style={styles.link}>
+              <Link href="/(auth)/RegisterScreen" style={styles.link}>
                 Register
               </Link>
             </Text>
-          </TouchableOpacity>
+          </Text>
         </View>
       </View>
     </ScrollView>
@@ -263,7 +260,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.lightColor.text,
     textAlign: "center",
-    marginBottom: 10,
+    marginBottom: 20,
   },
   link: {
     fontSize: 14,

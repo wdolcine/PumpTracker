@@ -35,7 +35,7 @@ export const UserLocationProvider: React.FC<{ children: ReactNode }> = ({
 
   const requestUserLocation = useCallback(async () => {
     try {
-      let { status } = await Location.requestBackgroundPermissionsAsync();
+      let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         setErrorMsg("Permission to access location was denied");
         return;
@@ -47,23 +47,6 @@ export const UserLocationProvider: React.FC<{ children: ReactNode }> = ({
       setErrorMsg(`Error retrieving location : ${error}`);
     }
   }, []);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     let { status } = await Location.requestForegroundPermissionsAsync();
-  //     if (status !== "granted") {
-  //       setErrorMsg("Permission to access location was denied");
-  //       return;
-  //     }
-  //     try {
-  //       let location = await Location.getCurrentPositionAsync({});
-  //       setLocation(location);
-  //       console.log(location.coords);
-  //     } catch (error) {
-  //       setErrorMsg(`Error retrieving location: ${error}`);
-  //     }
-  //   })();
-  // }, []);
 
   useEffect(() => {
     requestUserLocation();
