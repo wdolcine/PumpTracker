@@ -127,7 +127,7 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
       />
       {disabled && (
         <Text style={styles.disabledMessage}>
-          Login required to search locations.
+          Login required to search gas station.
         </Text>
       )}
     </View>

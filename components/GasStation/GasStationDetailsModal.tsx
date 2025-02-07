@@ -16,6 +16,7 @@ import {
   LocationContextType,
 } from "@/context/UserLocationContext";
 import { GEOAPIFY_API_KEY_Places_Details } from "@/constants/VariableConfigApi";
+import { Feather } from "@expo/vector-icons";
 
 interface GasStationDetailsModalProps {
   isVisible: boolean;
@@ -165,23 +166,35 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
             />
           ) : details ? (
             <ScrollView style={styles.scrollView}>
+              <TouchableOpacity onPress={onClose}>
+                <Feather
+                  name="x"
+                  size={30}
+                  style={styles.closeButton1}
+                  color={Colors.lightColor.iconDefault}
+                />
+              </TouchableOpacity>
+
               <Text style={styles.stationName}>{details.name}</Text>
               <Text style={styles.detailText}>
                 {" "}
                 <Text style={styles.title}>Address: </Text>
                 {details.address}
               </Text>
-              {details.rating !== undefined && (
+              <View style={styles.lines} />
+              {/* {details.rating !== undefined && (
                 <Text style={styles.detailText}>
                   {" "}
                   <Text style={styles.title}>Rating :</Text>
                   {details.rating}
                 </Text>
-              )}
+              )} */}
               <Text style={styles.detailText}>
                 <Text style={styles.title}>Open Now : </Text>
                 {details.open_now ? "Yes" : "No"}
               </Text>
+              <View style={styles.lines} />
+
               {details.opening_hours > 0 && (
                 <View>
                   <Text style={styles.detailText}> Opening Hours: </Text>
@@ -213,6 +226,7 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
                   No fuel options available
                 </Text>
               )}
+              <View style={styles.lines} />
               <FlatList
                 data={modes}
                 renderItem={renderModeItem}
@@ -221,10 +235,12 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
                 keyExtractor={(item) => item}
                 style={styles.modeSelector}
               />
+              <View style={styles.lines} />
               <Text style={styles.detailText}>
                 <Text style={styles.title}>Distance:</Text>{" "}
                 {distance ? `${distance.toFixed(2)} km` : "Calculating..."}
               </Text>
+              <View style={styles.lines} />
               <Text style={styles.detailText}>
                 <Text style={styles.title}>Duration:</Text>{" "}
                 {duration ? `${duration.toFixed(0)} minutes` : "Calculating..."}
@@ -234,9 +250,9 @@ const GasStationDetailsModal: React.FC<GasStationDetailsModalProps> = ({
             <Text style={styles.errorText}>No details available</Text>
           )}
 
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+          {/* <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Text style={styles.closeButtonText}>Close</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </Modal>
@@ -254,6 +270,12 @@ const styles = StyleSheet.create({
     margin: 20,
     padding: 20,
     borderRadius: 10,
+  },
+  lines: {
+    borderBottomColor: "gray",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingBottom: 10,
+    paddingTop: 5,
   },
   scrollView: {
     padding: 5,
@@ -315,6 +337,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
+  },
+  closeButton1: {
+    position: "relative",
+    alignSelf: "flex-end",
   },
   closeButtonText: {
     color: "white",

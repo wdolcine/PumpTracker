@@ -76,10 +76,7 @@ const GasStationCards: React.FC = () => {
   if (!currentUser) {
     return (
       <View style={styles.viewNoUser}>
-        <Text style={styles.textNoUser}>
-          {" "}
-          No nearby gas Stations available please
-        </Text>
+        <Text style={styles.textNoUser}> No nearby gas Stations available</Text>
         <TouchableOpacity
           style={styles.LoginBtn}
           onPress={() => {
